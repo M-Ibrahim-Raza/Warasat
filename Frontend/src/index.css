@@ -1,9 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@300;400&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-body {
+html {
   @apply font-poppins;
+  @apply text-[13px];
+}
+
+@screen sm {
+  html {
+    @apply text-[14px];
+  }
+}
+
+@screen md {
+  html {
+    @apply text-[15px];
+  }
+}
+
+@screen lg {
+  html {
+    @apply text-[16px];
+  }
+}
+
+@screen xl {
+  html {
+    @apply text-[18px];
+  }
+}
+
+@screen 2xl {
+  html {
+    @apply text-[20px];
+  }
 }

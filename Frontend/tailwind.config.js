@@ -8,12 +8,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        background_color: "#D9FFE4",
-        text_color: "#02615E",
-        background_color_dark_green: "#032945",
+        TCLG1: "#edfff2",
+        TCLG2: "#D9FFE4",
+        TCDG1: "#02615E",
+        TCDG2: "#032945",
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+        Montserrat: ["Montserrat", "serif"],
       },
     },
   },
