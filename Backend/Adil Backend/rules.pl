@@ -1,5 +1,7 @@
 % Main inheritance calculator 
-inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, NumSonsSons, NumSonsDaughters, HusbandShare, PerWifeShare, PerSonShare, PerDaughterShare, PerSonsDaughterShare) :-
+inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, NumSonsSons, NumSonsDaughters, HasFather, NumSonsSonsDaughters, 
+    NumSonsSonsSons, HasMother, NumRealBrothers, NumRealSisters, NumPaternalBrothers, NumPaternalSisters, NumMaternalSiblings, HasFathersFather,
+    HusbandShare, PerWifeShare, PerSonShare, PerDaughterShare, PerSonsDaughterShare, FatherShare, PerSonsSonsDaughterShare, MotherShare, FathersFatherShare) :-
     % Step 1: Calculate fixed shares for husband/wives
     calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth1),
 
@@ -41,9 +43,69 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
 
     RemainingWealth3 is RemainingWealth2 - SonsDaughtersShare,
 
-    % Step 5: Distribute remaining wealth among children if sons exist
+    % Step 5: Son's Son's Daughter
+    ( (NumSonsSonsDaughters >= 2, NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0, NumSonsSonsSons =:= 0) ->
+        SonsSonsDaughtersShare is RemainingWealth3 * 2 / 3  % 2/3 share
+    ;
+        ( (NumSonsSonsDaughters =:= 1, NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0, NumSonsSonsSons =:= 0) ->
+            SonsSonsDaughtersShare is RemainingWealth3 / 2  % 1/2 share
+        ;
+            ( (NumDaughters =:= 1; NumSonsDaughters =:= 1), NumSons =:= 0, NumSonsSons =:= 0, NumSonsSonsSons =:= 0 ->
+                SonsSonsDaughtersShare is RemainingWealth3 / 6  % 1/6 share
+            ;
+                SonsSonsDaughtersShare = 0  % No share otherwise
+            )
+        )
+    ),
+
+    RemainingWealth4 is RemainingWealth3 - SonsSonsDaughtersShare,
+
+    % Step 6: Father's Share
+    (HasFather =:= 1 -> 
+        ( (NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0) ->    % no children, no share
+            FatherShare is 0
+            ;
+            FatherShare is RemainingWealth4 / 6
+        )
+    ;
+        FatherShare is 0
+    ),
+    RemainingWealth5 is RemainingWealth4 - FatherShare,
+
+    % Step 7: Mother's Share
+    (HasMother =:= 1 ->
+        (((NumSons > 0 ; NumDaughters > 0 ; NumSonsSons > 0 ; NumSonsDaughters > 0) ;   % children condition
+            (NumRealBrothers + NumRealSisters + NumPaternalBrothers + NumPaternalSisters + NumMaternalSiblings) >= 2 ;  % ikhwa condition
+            (HasHusband =:= 1 , HasFather =:= 1)) ->
+                MotherShare is RemainingWealth5 / 6
+        ;
+            ((NumWives > 0 , HasFather =:= 1) -> 
+                MotherShare is RemainingWealth5 / 4
+            ;
+                MotherShare is RemainingWealth5 / 3 
+            )
+        )
+    ;
+        MotherShare is 0
+    ),
+    RemainingWealth6 is RemainingWealth5 - MotherShare,
+
+    % Step 8: Father's Father Share
+    (HasFathersFather=:=1 ->
+        (((NumSons > 0 ; NumDaughters > 0 ; NumSonsSons > 0 ; NumSonsDaughters > 0) , (HasFather =:= 0)) ->   % children should be there and no father
+        FathersFatherShare is RemainingWealth6 / 6
+    ;
+        FathersFatherShare is 0
+    )
+    ;
+        FathersFatherShare is 0 
+    ),
+    RemainingWealth7 is RemainingWealth6 - FathersFatherShare,
+                                                                            % Residuary Shares
+
+    % Step 14: Distribute remaining wealth among children if sons exist
     (NumSons > 0 ->
-        calculate_children_shares(RemainingWealth3, NumSons, NumDaughters, FinalSonsShare, FinalDaughtersShare)
+        calculate_children_shares(RemainingWealth7, NumSons, NumDaughters, FinalSonsShare, FinalDaughtersShare)
     ;
         FinalSonsShare = SonsShare1,
         FinalDaughtersShare = DaughtersShare1
@@ -52,13 +114,14 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     % Step 6: Distribute individual shares
     calculate_individual_share(FinalSonsShare, NumSons, PerSonShare),
     calculate_individual_share(FinalDaughtersShare, NumDaughters, PerDaughterShare),
+    calculate_individual_share(SonsSonsDaughtersShare, NumSonsSonsDaughters, PerSonsSonsDaughterShare),
     calculate_individual_share(SonsDaughtersShare, NumSonsDaughters, PerSonsDaughterShare).
 
 
 % Calculate fixed shares for husband/wives and remaining wealth
 calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth) :-
     (HasHusband =:= 1 ->  % If husband is present
-        (NumSons =:= 0, NumDaughters =:= 0 ->  % No children
+        (NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0 ->  % No children
             HusbandShare is TotalWealth / 2,  % Husband gets 1/2 if no children
             TotalWivesShare = 0,  % No wives if husband is present
             RemainingWealth is TotalWealth - HusbandShare
@@ -69,7 +132,7 @@ calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         )
     ;
         (NumWives > 0 ->  % If wives are present
-            (NumSons =:= 0, NumDaughters =:= 0 ->  % No children
+            (NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0 ->  % No children
                 TotalWivesShare is TotalWealth / 4,  % Wives get 1/4 if no children
                 HusbandShare = 0,  % No husband
                 RemainingWealth is TotalWealth - TotalWivesShare
@@ -100,3 +163,5 @@ calculate_children_shares(TotalWealth, NumSons, NumDaughters, SonsShare, Daughte
 % Calculate individual shares
 calculate_individual_share(TotalShare, Count, OneShare) :-
     (Count > 0 -> OneShare is TotalShare / Count ; OneShare = 0).
+
+
