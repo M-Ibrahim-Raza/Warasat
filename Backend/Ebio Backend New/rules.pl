@@ -1,5 +1,6 @@
-% Main inheritance calculator 
+% Main inheritance calculator rule triggered from python 
 inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, NumSonsSons, NumSonsDaughters, HusbandShare, PerWifeShare, PerSonShare, PerDaughterShare, PerSonsDaughterShare) :-
+
     % Step 1: Calculate fixed shares for husband/wives
     calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth1),
 
@@ -100,3 +101,15 @@ calculate_children_shares(TotalWealth, NumSons, NumDaughters, SonsShare, Daughte
 % Calculate individual shares
 calculate_individual_share(TotalShare, Count, OneShare) :-
     (Count > 0 -> OneShare is TotalShare / Count ; OneShare = 0).
+
+
+(children):- (NumSons =\= 0; NumDaughters =\= 0;NumSonsSons =\= 0; NumSonsDaughters =\= 0).
+
+
+
+
+children - true - any variable has >0
+children - false - all variables are 0
+
+, - AND
+; - OR

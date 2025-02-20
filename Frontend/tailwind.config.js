@@ -10,6 +10,7 @@ export default {
       colors: {
         TCLG1: "#edfff2",
         TCLG2: "#D9FFE4",
+        TCT1: "#57ffc4",
         TCDG1: "#02615E",
         TCDG2: "#032945",
       },
