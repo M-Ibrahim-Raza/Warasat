@@ -3,7 +3,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     NumSonsSonsSons, HasFather, HasMother, NumRealBrothers, NumRealSisters, NumPaternalBrothers, NumPaternalSisters, NumMaternalSiblings, 
     HasFathersFather, HasFathersMother, HasMothersMother, HusbandShare, PerWifeShare, PerSonShare, PerDaughterShare, PerSonsDaughterShare, 
     FatherShare, PerSonsSonsDaughterShare, MotherShare, FathersFatherShare, FathersMotherShare, MothersMotherShare, PerRealSisterShare, 
-    PerPaternalSisterShare, PerMaternalSiblingShare, PerSonsSonShare, PerSonsSonsSonShare, PerRealBrotherShare) :-
+    PerPaternalSisterShare, PerMaternalSiblingShare, PerSonsSonShare, PerSonsSonsSonShare, PerRealBrotherShare, PerPaternalBrotherShare) :-
     % Step 1: Calculate fixed shares for husband/wives
     calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth1),
 
@@ -146,28 +146,28 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     % Step 12: Paternal Sister
     (NumPaternalSisters > 0 ->
     ( (NumSons > 0 ; NumDaughters > 0 ; NumSonsSons > 0 ; NumSonsDaughters > 0 ; HasFather > 0 ; HasFathersFather > 0 ; NumRealBrothers > 0 ; NumPaternalBrothers > 0) ->
-        PaternalSistersShare is 0 
+        PaternalSistersShare1 is 0 
     ;
         (NumRealSisters =:= 1) ->
             ( (NumSons =:= 0, NumSonsSons =:= 0,NumDaughters =:= 0,NumSonsDaughters =:= 0, HasFather =:= 0, HasFathersFather =:= 0, NumRealBrothers =:= 0, NumPaternalBrothers =:= 0) ->
-                PaternalSistersShare is RemainingWealth9 / 6 
+                PaternalSistersShare1 is RemainingWealth9 / 6 
             ;
-                PaternalSistersShare is 0
+                PaternalSistersShare1 is 0
             )
     ;
         (NumPaternalSisters =:= 1, NumRealSisters =:= 0) ->
-            PaternalSistersShare is RemainingWealth9 / 2 
+            PaternalSistersShare1 is RemainingWealth9 / 2 
     ;
         (NumPaternalSisters > 1, NumRealSisters =:= 0) ->
-            PaternalSistersShare is RemainingWealth9 * 2 / 3 
+            PaternalSistersShare1 is RemainingWealth9 * 2 / 3 
     ;
-        PaternalSistersShare is 0 
+        PaternalSistersShare1 is 0 
         )
     ;
-        PaternalSistersShare is 0 
+        PaternalSistersShare1 is 0 
     ),
 
-    RemainingWealth10 is RemainingWealth9 - PaternalSistersShare,
+    RemainingWealth10 is RemainingWealth9 - PaternalSistersShare1,
 
 
     %Step 13: Maternal Siblings
@@ -227,7 +227,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         FathersFatherShare is FathersFatherShare1
     ),
 
-    %Step 19: Real Brother and sister
+    %Step 19: Real Siblings
     (NumRealBrothers > 0, HasFathersFather =:= 0, NumSons =:= 0, NumSonsSons =:= 0, NumSonsSonsSons =:= 0, HasFather=:= 0 -> 
         calculate_real_siblings_shares(RemainingWealth11,NumRealBrothers,NumRealSisters,FinalRealBrothersShare,FinalRealSistersShare)
     ;
@@ -235,7 +235,22 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         FinalRealSistersShare is RealSistersShare1
     ),
 
-    % Step 6: Distribute individual shares
+    %Step 20: Real Sister
+    (NumRealSisters > 0 ,RealSistersShare1=:= 0 ,NumRealBrothers =:= 0, HasFathersFather =:= 0, NumSons =:= 0, NumSonsSons =:= 0, NumSonsSonsSons =:= 0, HasFather=:= 0 ->
+        calculate_real_sister_share(RemainingWealth11,NumRealSisters,FinalRealSistersShare)
+        ;
+        FinalRealSistersShare is RealSistersShare1
+    ),
+
+    %Step 21: Paternal Siblings
+    (NumPaternalBrothers > 0, NumRealSisters =:= 0 ,NumRealBrothers =:= 0, HasFathersFather =:= 0, NumSons =:= 0, NumSonsSons =:= 0, NumSonsSonsSons =:= 0, HasFather=:= 0 ->
+        calculate_paternal_siblings_shares(RemainingWealth11,NumPaternalBrothers,NumPaternalSisters,FinalPaternalBrothersShare,FinalPaternalSistersShare)
+        ;
+        FinalPaternalSistersShare is PaternalSistersShare1,
+        FinalPaternalBrothersShare is 0
+    ),
+
+    % individual shares
     calculate_individual_share(FinalSonsShare, NumSons, PerSonShare),
     calculate_individual_share(FinalDaughtersShare, NumDaughters, PerDaughterShare),
     calculate_individual_share(FinalSonsSonsDaughtersShare, NumSonsSonsDaughters, PerSonsSonsDaughterShare),
@@ -244,7 +259,8 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     calculate_individual_share(FinalSonsSonsShare, NumSonsSons, PerSonsSonShare),
     calculate_individual_share(FinalRealSistersShare, NumRealSisters, PerRealSisterShare),
     calculate_individual_share(FinalRealBrothersShare, NumRealBrothers, PerRealBrotherShare),
-    calculate_individual_share(PaternalSistersShare, NumPaternalSisters, PerPaternalSisterShare),
+    calculate_individual_share(FinalPaternalSistersShare, NumPaternalSisters, PerPaternalSisterShare),
+    calculate_individual_share(FinalPaternalBrothersShare, NumPaternalBrothers, PerPaternalBrotherShare),
     calculate_individual_share(MaternalSiblingShare, NumMaternalSiblings, PerMaternalSiblingShare).
 
 
@@ -326,3 +342,19 @@ calculate_real_siblings_shares(TotalWealth, NumRealBrothers, NumRealSisters, Rea
         RealBrothersShare = 0,
         RealSistersShare = 0
     ).
+
+calculate_real_sister_share(TotalWealth, NumRealSisters, RealSistersShare) :-
+    RealSistersShare is TotalWealth.
+
+calculate_paternal_siblings_shares(TotalWealth, NumPaternalBrothers, NumPaternalSisters, PaternalBrothersShare, PaternalSistersShare) :-
+    (NumPaternalBrothers > 0 ->
+        TotalSiblingShares is NumPaternalBrothers * 2 + NumPaternalSisters, 
+        PaternalBrothersShare is TotalWealth * 2 / TotalSiblingShares * NumPaternalBrothers,
+        PaternalSistersShare is TotalWealth / TotalSiblingShares * NumPaternalSisters
+    ;
+        PaternalBrothersShare = 0,
+        PaternalSistersShare = 0
+    ).
+
+calculate_paternal_sister_share(TotalWealth, NumPaternalSisters, PaternalSistersShare) :-
+    PaternalSistersShare is TotalWealth.
