@@ -8,6 +8,7 @@ import Button from "../../Components/Button";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setAmount,setFuneralExpenses,setMehr,setDebt,setWill} from "../store/detailsSlice";
+import { setDistributionMethod,setGender,toggleFuneralExpenses,toggleMehr,toggleDebt,toggleWill } from "@/store/optionsSlice";  
 
 const Calculator = () => {
   
@@ -20,12 +21,12 @@ const Calculator = () => {
   const will = useSelector((state) => state.details.will);
   const currency = useSelector((state) => state.details.currency);
 
-  const [distributionMethod, setDistributionMethod] = useState("amount");
-  const [gender, setGender] = useState("male");
-  const [funeralExpensesToggle, setFuneralExpensesToggle] = useState(false);
-  const [mehrToggle, setMehrToggle] = useState(false);
-  const [debtToggle, setDebtToggle] = useState(false);
-  const [willToggle, setWillToggle] = useState(true);
+  const distributionMethod=useSelector((state)=>state.options.distributionMethod)
+  const gender=useSelector((state)=>state.options.gender)
+  const funeralExpensesOption = useSelector((state) => state.options.funeralExpenses)
+  const mehrOption=useSelector((state)=>state.options.mehr)
+  const debtOption=useSelector((state)=>state.options.debt)
+  const willOption=useSelector((state)=>state.options.will)
 
   return (
     <>
@@ -40,7 +41,7 @@ const Calculator = () => {
             name="payment"
             value="amount"
             checked={distributionMethod === "amount"}
-            onChange={(e) => setDistributionMethod(e.target.value)}
+            onChange={(e) => dispatch(setDistributionMethod(e.target.value))}
           >
             Amount
           </RadioButton>
@@ -50,7 +51,7 @@ const Calculator = () => {
             name="payment"
             value="percentage"
             checked={distributionMethod === "percentage"}
-            onChange={(e) => setDistributionMethod(e.target.value)}
+            onChange={(e) => dispatch(setDistributionMethod(e.target.value))}
           >
             Percentage
           </RadioButton>
@@ -64,7 +65,7 @@ const Calculator = () => {
             name="gender"
             value="male"
             checked={gender === "male"}
-            onChange={(e) => setGender(e.target.value)}
+            onChange={(e) => dispatch(setGender(e.target.value))}
           >
             Male
           </RadioButton>
@@ -74,7 +75,7 @@ const Calculator = () => {
             name="gender"
             value="female"
             checked={gender === "female"}
-            onChange={(e) => setGender(e.target.value)}
+            onChange={(e) => dispatch(setGender(e.target.value))}
           >
             Female
           </RadioButton>
@@ -84,28 +85,41 @@ const Calculator = () => {
         <div className="options flex flex-row gap-4 items-center justify-center">
 
 
-          {distributionMethod === "amount" && <OptionToggle className="funeral-toggle" checked={funeralExpensesToggle} onCheckedChange={setFuneralExpensesToggle}>Funeral Expenses</OptionToggle>}
+          {distributionMethod === "amount" && <OptionToggle className="funeral-toggle" checked={funeralExpensesOption} onCheckedChange={()=>{
+            dispatch(toggleFuneralExpenses())
+            dispatch(setFuneralExpenses(""))
+            }}>Funeral Expenses</OptionToggle>}
 
-          {gender === "male" && distributionMethod === "amount" && <OptionToggle className="mehr-toggle" checked={mehrToggle} onCheckedChange={setMehrToggle}>Haq Mehr</OptionToggle>}
+          {gender === "male" && distributionMethod === "amount" && <OptionToggle className="mehr-toggle" checked={mehrOption} onCheckedChange={()=>{
+            dispatch(toggleMehr())
+            dispatch(setMehr(""))
+          }}>Haq Mehr</OptionToggle>}
 
-          {distributionMethod === "amount" && <OptionToggle className="debt-toggle" checked={debtToggle} onCheckedChange={setDebtToggle}>Debt</OptionToggle>}
+          {distributionMethod === "amount" && <OptionToggle className="debt-toggle" checked={debtOption} onCheckedChange={()=>{
+            dispatch(toggleDebt())
+            dispatch(setDebt(""))
+          }}>Debt</OptionToggle>}
 
-          <OptionToggle className="will-toggle" checked={willToggle} onCheckedChange={setWillToggle}>Will</OptionToggle>
+          <OptionToggle className="will-toggle" checked={willOption} onCheckedChange={
+            ()=>{dispatch(toggleWill())
+            dispatch(setWill(""))
+            }
+            }>Will</OptionToggle>
 
         </div>
 
         <h1 className="mt-4 mx-auto text-center text-lg font-Montserrat font-bold text-TCDG2 drop-shadow-lg ">Details</h1>
         <div className="inputs flex flex-col justify-center items-center gap-2">
 
-          {distributionMethod === "amount" && <ValInput className="amount-input" id="amount" value={amount} placeholder="Enter Amount that Deceased have left" label="Amount" onChange={(e) => dispatch(setAmount(e.target.value))} currencies={["Rs", "$", "€", "£"]} currency={currency}></ValInput>}
+          {distributionMethod === "amount" && <ValInput className="amount-input" id="amount" value={amount} placeholder="Enter Amount that Deceased have left" label="Amount" onChange={(e) => dispatch(setAmount((Number(e.target.value.replace(/,/g, "")) )))} currencies={["Rs", "$", "€", "£"]} currency={currency}></ValInput>}
 
-          {distributionMethod === "amount" && funeralExpensesToggle && <ValInput className="funeral-expenses-input" id="funeral-expenses" value={funeralExpenses} placeholder="Enter Funeral and Burial Expenses" label="Funeral Expenses" onChange={(e) => dispatch(setFuneralExpenses(e.target.value))} currency={currency} ></ValInput>}
+          {distributionMethod === "amount" && funeralExpensesOption && <ValInput className="funeral-expenses-input" id="funeral-expenses" value={funeralExpenses} placeholder="Enter Funeral and Burial Expenses" label="Funeral Expenses" onChange={(e) => dispatch(setFuneralExpenses((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
 
-          {distributionMethod === "amount" && mehrToggle && <ValInput className="mehr-input" id="mehr-expenses" value={mehr} placeholder="Enter Haq Mehr" label="Haq Mehr" onChange={(e) => dispatch(setMehr(e.target.value))} currency={currency} ></ValInput>}
+          {distributionMethod === "amount" && mehrOption && <ValInput className="mehr-input" id="mehr-expenses" value={mehr} placeholder="Enter Haq Mehr" label="Haq Mehr" onChange={(e) => dispatch(setMehr((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
 
-          {distributionMethod === "amount" && debtToggle && <ValInput className="debt-input" id="debt" value={debt} placeholder="Enter Debt & Liabilities" label="Debt & Liabilities" onChange={(e) => dispatch(setDebt(e.target.value))} currency={currency} ></ValInput>}
+          {distributionMethod === "amount" && debtOption && <ValInput className="debt-input" id="debt" value={debt} placeholder="Enter Debt & Liabilities" label="Debt & Liabilities" onChange={(e) => dispatch(setDebt((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
 
-          {willToggle && <ValInput className="will-input" id="will" value={will} placeholder="Enter Will Amount" label="Will" onChange={(e) => dispatch(setWill(e.target.value))} currency={currency} ></ValInput>}
+          {willOption && <ValInput className="will-input" id="will" value={will} placeholder="Enter Will Amount" label="Will" onChange={(e) => dispatch(setWill((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
 
           <Link to='/inheritance-calculator-heirs'>
             <Button className="mt-6 !py-2">Proceed to Next Step &gt;</Button>

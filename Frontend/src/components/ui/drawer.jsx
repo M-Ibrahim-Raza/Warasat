@@ -1,5 +1,12 @@
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { cn } from "@/lib/utils"
 
@@ -25,7 +32,7 @@ const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
 ))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
-const DrawerContent = React.forwardRef(({ className, children, ...props }, ref) => (
+const DrawerContent = React.forwardRef(({ heir_types, selectedValue, setSelectedValue, className, children, ...props }, ref) => (
   <DrawerPortal>
     <DrawerOverlay />
     <DrawerPrimitive.Content
@@ -37,6 +44,19 @@ const DrawerContent = React.forwardRef(({ className, children, ...props }, ref) 
       {...props}>
       <div className="relative">
         <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-TCDG2"></div>
+        
+        <div className="absolute top-2 left-2">
+          <Select value={selectedValue} onValueChange={(value)=>setSelectedValue(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Heir Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {heir_types.map((heir_type,ind)=>{
+                return <SelectItem key={ind} value={heir_type}>{heir_type}</SelectItem>
+              })}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="absolute top-2 right-2">
           <DrawerClose>
             <svg class="h-8 w-8 text-TCR1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  <circle cx="12" cy="12" r="10" />  <line x1="15" y1="9" x2="9" y2="15" />  <line x1="9" y1="9" x2="15" y2="15" /></svg>

@@ -43,13 +43,23 @@ const ValInput = ({
           text-center">{currency}</div>}
 
         <input
-          type="number"
+          type="text"
           id={id}
+          onInput={(e) => !e.target.validity.valid && (e.target.value = "")}
+          onKeyDown={(e) => {
+            if (
+              !/^[0-9]$|^10$/.test(e.key) && // Allow numbers 0-10
+              !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab","Escape","ArrowUp","ArrowDown","F5"].includes(e.key) // Allow essential keys
+            ) {
+              e.preventDefault();
+            }
+          }}
+
           name={name}
-          value={value}
+          value={value===""?"":Number(value).toLocaleString()}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full pl-14 pr-4 py-2 bg-TCLG1/60 border-2 border-TCDG1 rounded-lg text-TCDG2 placeholder-TCDG2/70 focus:outline-none focus:ring-2 focus:ring-TCDG1 transition-all ease-in-out "
+          className="w-full pl-14 pr-4 py-2 bg-TCLG1/60 border-2 border-TCDG1 rounded-lg text-TCDG2 placeholder-TCDG2/70 focus:outline-none focus:ring-2 focus:ring-TCDG1 transition-all ease-in-out font-medium focus:text-TCDG2 focus:font-semibold"
         />
       </div>
     </div>

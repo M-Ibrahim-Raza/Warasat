@@ -1,51 +1,40 @@
-import React, { useState } from "react";
-import { Switch } from "@/components/ui/switch"; // Ensure the path is correct
-// import OptionToggle from "/../Components/OptionToggle";
-import OptionToggle from "../../Components/OptionToggle";
-import ValInput from "../../Components/ValInput";
-import Button from "../../Components/Button";
+import React, { useState } from 'react'
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import HeirButton from "@/../Components/HeirButton";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 
 
 const Test = () => {
 
-
+  const [val,setVal]=useState(1)
   return (
-    <>
-      <br />
-      <HeirButton />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <Drawer>
-        <DrawerTrigger><Button>Open</Button></DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-            <DrawerDescription>This action cannot be undone.</DrawerDescription>
-          </DrawerHeader>
-          <DrawerFooter>
-            <Button>Submit</Button>
-            <DrawerClose>
-              <Button variant="outline">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </>
-  );
-};
+    <div className='mt-10 ml-10'>
 
-export default Test;
+      <div>
+        <div className="flex-col gap-4 flex px-2 py-10 bg-white/60">
+        
+          <Select>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Heir Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">Light</SelectItem>
+              <SelectItem value="dark">Dark</SelectItem>
+              <SelectItem value="system">System</SelectItem>
+            </SelectContent>
+          </Select>
+
+      </div>
+
+    </div>
+    </div>
+
+  )
+}
+
+export default Test
