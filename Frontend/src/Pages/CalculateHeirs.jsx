@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  heirs,
+  updateHeirList,
+  decrementHeirVal,
+  deleteHeir,
+} from "../store/heirsSlice";
+import { Link } from "react-router-dom";
+import {
   common_heirs,
-  parent_heirs,
   children_heirs_grouped,
   sibling_heirs,
   spouse_heir,
@@ -28,9 +32,8 @@ import {
 import HeirButton from "@/../Components/HeirButton";
 
 export const CalculateHeirs = () => {
+  const dispatch = useDispatch();
   const [heirType, setHeirType] = useState("");
-  const [val, setVal] = useState(1);
-  const [heirList, setHeirList] = useState([]);
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
   const mehr = useSelector((state) => state.details.mehr);
@@ -38,6 +41,7 @@ export const CalculateHeirs = () => {
   const will = useSelector((state) => state.details.will);
   const currency = useSelector((state) => state.details.currency);
   const gender = useSelector((state) => state.options.gender);
+  const heirList = useSelector((state) => state.heirs.heirList);
 
   const total_amount = amount - funeralExpenses - mehr - debt - will;
 
@@ -61,6 +65,7 @@ export const CalculateHeirs = () => {
 
   return (
     <>
+      {console.log(heirList)}
       <Heading className="w-[35rem]">Islamic Inheritance Calculator</Heading>
       <div
         id="asset-screen"
@@ -143,21 +148,7 @@ export const CalculateHeirs = () => {
                             return (
                               <HeirButton
                                 onClick={() => {
-                                  setHeirList((prev) => {
-                                    const exists = prev.some(
-                                      (h) => h.relation === heir.relation
-                                    );
-
-                                    return exists
-                                      ? heir["limit"] === 1
-                                        ? prev
-                                        : prev.map((h) =>
-                                            h.relation === heir.relation
-                                              ? { ...h, val: h.val + 1 }
-                                              : h
-                                          )
-                                      : [...prev, { ...heir, val: 1 }];
-                                  });
+                                  dispatch(updateHeirList(heir));
                                 }}
                                 key={group_ind * current_group.length + ind}
                                 className="flex-1"
@@ -181,21 +172,7 @@ export const CalculateHeirs = () => {
                             return (
                               <HeirButton
                                 onClick={() => {
-                                  setHeirList((prev) => {
-                                    const exists = prev.some(
-                                      (h) => h.relation === heir.relation
-                                    );
-
-                                    return exists
-                                      ? heir["limit"] === 1
-                                        ? prev
-                                        : prev.map((h) =>
-                                            h.relation === heir.relation
-                                              ? { ...h, val: h.val + 1 }
-                                              : h
-                                          )
-                                      : [...prev, { ...heir, val: 1 }];
-                                  });
+                                  dispatch(updateHeirList(heir));
                                 }}
                                 key={group_ind * current_group.length + ind}
                                 className="basis-[25%]"
@@ -219,21 +196,7 @@ export const CalculateHeirs = () => {
                             return (
                               <HeirButton
                                 onClick={() => {
-                                  setHeirList((prev) => {
-                                    const exists = prev.some(
-                                      (h) => h.relation === heir.relation
-                                    );
-
-                                    return exists
-                                      ? heir["limit"] === 1
-                                        ? prev
-                                        : prev.map((h) =>
-                                            h.relation === heir.relation
-                                              ? { ...h, val: h.val + 1 }
-                                              : h
-                                          )
-                                      : [...prev, { ...heir, val: 1 }];
-                                  });
+                                  dispatch(updateHeirList(heir));
                                 }}
                                 key={group_ind * current_group.length + ind}
                                 className="basis-[25%]"
@@ -252,21 +215,7 @@ export const CalculateHeirs = () => {
                         return (
                           <HeirButton
                             onClick={() => {
-                              setHeirList((prev) => {
-                                const exists = prev.some(
-                                  (h) => h.relation === heir.relation
-                                );
-
-                                return exists
-                                  ? heir["limit"] === 1
-                                    ? prev
-                                    : prev.map((h) =>
-                                        h.relation === heir.relation
-                                          ? { ...h, val: h.val + 1 }
-                                          : h
-                                      )
-                                  : [...prev, { ...heir, val: 1 }];
-                              });
+                              dispatch(updateHeirList(heir));
                             }}
                             key={ind}
                             className="flex-1"
@@ -282,26 +231,7 @@ export const CalculateHeirs = () => {
                     <div className="flex basis-[28%] justify-center">
                       <HeirButton
                         onClick={() => {
-                          setHeirList((prev) => {
-                            const exists = prev.some(
-                              (h) =>
-                                h.relation === spouse_heir_filtered[0].relation
-                            );
-
-                            return exists
-                              ? spouse_heir_filtered[0]["limit"] === 1
-                                ? prev
-                                : prev.map((h) =>
-                                    h.relation ===
-                                    spouse_heir_filtered[0].relation
-                                      ? { ...h, val: h.val + 1 }
-                                      : h
-                                  )
-                              : [
-                                  ...prev,
-                                  { ...spouse_heir_filtered[0], val: 1 },
-                                ];
-                          });
+                          dispatch(updateHeirList(spouse_heir_filtered[0]));
                         }}
                         className="basis-[18%]"
                       >
@@ -319,30 +249,22 @@ export const CalculateHeirs = () => {
               return (
                 <HeirInput
                   onDelete={() => {
-                    setHeirList((prev) =>
-                      prev.filter((h) => h["relation"] !== heir["relation"])
-                    );
+                    dispatch(deleteHeir(heir));
                   }}
                   isSingle={heir["limit"] === 1 ? true : false}
                   onIncrement={() => {
                     heir["val"] < heir["limit"] &&
-                      setHeirList((prev) =>
-                        prev.map((h) =>
-                          h === heir ? { ...h, val: h.val + 1 } : h
-                        )
-                      );
+                      dispatch(updateHeirList(heir));
                   }}
                   val={heir["val"]}
                   onDecrement={() => {
+                    {
+                      console.log("Hi");
+                    }
+
                     heir["val"] > 1
-                      ? setHeirList((prev) =>
-                          prev.map((h) =>
-                            h === heir ? { ...h, val: h.val - 1 } : h
-                          )
-                        )
-                      : setHeirList((prev) =>
-                          prev.filter((h) => h["relation"] !== heir["relation"])
-                        );
+                      ? dispatch(decrementHeirVal(heir))
+                      : dispatch(deleteHeir(heir));
                   }}
                 >
                   {capitalizeWords(heir["relation"])}
@@ -350,6 +272,13 @@ export const CalculateHeirs = () => {
               );
             })}
           </div>
+        </div>
+        <div className="flex justify-center">
+          {heirList.length !== 0 && (
+            <Link to="/inheritance-calculation">
+              <Button className="mt-6 !py-2">Calculate Shares</Button>
+            </Link>
+          )}
         </div>
       </div>
       <div className="w-full h-16"></div>

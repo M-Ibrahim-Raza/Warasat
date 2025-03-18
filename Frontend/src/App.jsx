@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom"; // Import Router components
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom"; // Import Router components
 import Splash from "./Splash";
 import Home from "./Pages/Home";
 import NavBar from "../Components/NavBar";
@@ -8,9 +13,9 @@ import Calculator from "./Pages/Calculator";
 import Test from "./Pages/Test";
 import Test2 from "./Pages/Test2";
 import { CalculateHeirs } from "./Pages/CalculateHeirs";
+import Calculation from "./Pages/Calculation";
 
 const AppWrapper = () => {
-
   // const location = useLocation();
 
   // let path = location.pathname
@@ -27,7 +32,11 @@ const AppWrapper = () => {
           {/* <Route path="/" element={<Splash />} />{" "} */}
           <Route path="/" element={<Home />} />{" "}
           <Route path="/inheritance-calculator" element={<Calculator />} />
-          <Route path="/inheritance-calculator-heirs" element={<CalculateHeirs />} />
+          <Route
+            path="/inheritance-calculator-heirs"
+            element={<CalculateHeirs />}
+          />
+          <Route path="/inheritance-calculation" element={<Calculation />} />
           <Route path="/test" element={<Test />}></Route>
           <Route path="/test2" element={<Test2 />}></Route>
         </Routes>
