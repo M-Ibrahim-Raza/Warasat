@@ -40,6 +40,10 @@ html {
   }
 }
 
+.active {
+  @apply bg-TCDG1 rounded-full text-TCLG1
+}
+
 
 
 @layer base {

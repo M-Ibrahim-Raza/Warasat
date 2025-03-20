@@ -1,40 +1,15 @@
-import React, { useState } from 'react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import PieChartComponent from "@/../Components/PieChartComponent";
 
 const Test = () => {
 
-  const [val,setVal]=useState(1)
   return (
-    <div className='mt-10 ml-10'>
-
-      <div>
-        <div className="flex-col gap-4 flex px-2 py-10 bg-white/60">
-        
-          <Select>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Heir Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
-
+    <div className="mt-10 ml-10">
+      <div className="flex flex-col items-center justify-center px-2 py-10 bg-white/60">
+      <PieChartComponent></PieChartComponent>
       </div>
-
     </div>
-    </div>
+  );
+};
 
-  )
-}
-
-export default Test
+export default Test;

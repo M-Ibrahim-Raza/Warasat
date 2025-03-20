@@ -4,7 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
-} from "react-router-dom"; // Import Router components
+} from "react-router-dom";
 import Splash from "./Splash";
 import Home from "./Pages/Home";
 import NavBar from "../Components/NavBar";

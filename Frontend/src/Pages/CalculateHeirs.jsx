@@ -65,7 +65,6 @@ export const CalculateHeirs = () => {
 
   return (
     <>
-      {console.log(heirList)}
       <Heading className="w-[35rem]">Islamic Inheritance Calculator</Heading>
       <div
         id="asset-screen"
