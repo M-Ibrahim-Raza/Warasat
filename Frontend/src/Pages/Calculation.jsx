@@ -2,6 +2,8 @@ import React from "react";
 import Heading from "../../Components/Heading";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { updateHeirSharesList } from "@/store/heirsSlice";
+import { calculatePercentage, formatNumber } from "@/Utilities/utilities";
 import DetailsDisplay from "../../Components/DetailsDisplay";
 import TableHeading from "@/../Components/Table/TableHeading";
 import TableCell from "@/../Components/Table/TableCell";
@@ -10,7 +12,7 @@ import PieChartComponent from "@/../Components/PieChartComponent";
 import axios from "axios";
 import { useEffect } from "react";
 
-const sendTestData = async (heirList, total_amount) => {
+const sendTestData = async (heirList, total_amount, dispatch) => {
   if (!heirList || heirList.length === 0) {
     console.warn("No heirs data to send.");
     return;
@@ -20,7 +22,7 @@ const sendTestData = async (heirList, total_amount) => {
     const response = await axios.post(
       "http://127.0.0.1:5000/inheritance-calculator-2",
       {
-        heirs: heirList,
+        heir_list: heirList,
         total_amount: total_amount,
       },
       {
@@ -29,14 +31,19 @@ const sendTestData = async (heirList, total_amount) => {
         },
       }
     );
+    console.log("API Response:", response.data);
 
-    console.log("Response:", response.data);
+    if (response.data && response.data.heir_list) {
+      dispatch(updateHeirSharesList(response.data.heir_list));
+    }
   } catch (error) {
     console.error("Error:", error);
   }
 };
 
 const Calculation = () => {
+  const dispatch = useDispatch()
+
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
   const mehr = useSelector((state) => state.details.mehr);
@@ -45,12 +52,13 @@ const Calculation = () => {
   const currency = useSelector((state) => state.details.currency);
   const gender = useSelector((state) => state.options.gender);
   const heirList = useSelector((state) => state.heirs.heirList);
+  const heirSharesList = useSelector((state) => state.heirs.heirSharesList);
   const [viewToggle, setViewToggle] = useState(0);
   const total_amount = amount - funeralExpenses - mehr - debt - will;
 
   useEffect(() => {
     if (heirList && heirList.length > 0) {
-      sendTestData(heirList, total_amount);
+      sendTestData(heirList, total_amount, dispatch);
     }
   }, []);
 
@@ -68,13 +76,13 @@ const Calculation = () => {
             mehr !== "" ||
             debt !== "" ||
             will !== "") && (
-            <DetailsDisplay>
-              <span>Total Asset Amount</span>
-              <span>
-                {currency} {Number(amount).toLocaleString()}
-              </span>
-            </DetailsDisplay>
-          )}
+              <DetailsDisplay>
+                <span>Total Asset Amount</span>
+                <span>
+                  {currency} {Number(amount).toLocaleString()}
+                </span>
+              </DetailsDisplay>
+            )}
           {funeralExpenses !== "" && (
             <DetailsDisplay className="text-TCR1 text-base">
               <span>Funeral & Burial Expenses</span>
@@ -142,18 +150,27 @@ const Calculation = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr class="bg-TCLG">
-                  <TableCell>father</TableCell>
-                  <TableCell>primary</TableCell>
-                  <TableCell>25%</TableCell>
-                  <TableCell>$10000</TableCell>
-                </tr>
-                <tr class="bg-TCLG3">
-                  <TableCell>father</TableCell>
-                  <TableCell>primary</TableCell>
-                  <TableCell>25%</TableCell>
-                  <TableCell>$10000</TableCell>
-                </tr>
+
+
+                {heirSharesList.map((heir, index) => {
+
+                  let display_count = heir.val > 1 ? ` × ${heir.val}` : "";
+                  let amount_display_count = heir.val > 1 ? ` × ${heir.val} = ${formatNumber(heir.val*heir.amount)}` : "";
+                  let percentage_display_count = heir.val > 1
+                    ? ` × ${heir.val} = ${calculatePercentage(heir.val * heir.amount, total_amount)} %`
+                    : "";
+
+                  return (
+                    <tr key={index} className="bg-TCLG-1">
+                      <TableCell>{heir.relation + display_count}</TableCell>
+                      <TableCell>{heir.category[1]}</TableCell>
+                      <TableCell>{calculatePercentage(heir.amount,total_amount)+" %" + percentage_display_count}</TableCell>
+                      <TableCell>{currency+" "+formatNumber(heir.amount)+amount_display_count}</TableCell>
+                    </tr>
+                  );
+                })}
+
+
               </tbody>
             </table>
           </div>
@@ -165,17 +182,18 @@ const Calculation = () => {
           </div>
         )}
       </div>
-      {console.log(heirList)}
-      <ul>
-        {heirList.map((heir, index) => (
+      {/* Testing */}
+      {/* <ul>
+        {heirSharesList.map((heir, index) => (
           <li key={index}>
             <strong>Relation:</strong> {heir.relation} <br />
             <strong>Category:</strong> {heir.category.join(", ")} <br />
             <strong>Limit:</strong> {heir.limit} <br />
-            <strong>value:</strong> {heir.val}
+            <strong>value:</strong> {heir.val} <br />
+            <strong>amount:</strong> {heir.amount}
           </li>
         ))}
-      </ul>
+      </ul> */}
       <div className="w-full h-16"></div>
     </>
   );

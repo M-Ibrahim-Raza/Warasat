@@ -2,12 +2,18 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   heirList: [],
+  heirSharesList:[]
 };
 
 const heirsSlice = createSlice({
   name: "heirs",
   initialState,
   reducers: {
+
+    updateHeirSharesList : (state,action)=>{
+      state.heirSharesList = action.payload
+    },
+
     updateHeirList: (state, action) => {
       const heir = action.payload;
       const exists = state.heirList.some((h) => h.relation === heir.relation);
@@ -39,6 +45,6 @@ const heirsSlice = createSlice({
   },
 });
 
-export const { updateHeirList, deleteHeir, decrementHeirVal } =
+export const { updateHeirSharesList ,updateHeirList, deleteHeir, decrementHeirVal } =
   heirsSlice.actions;
 export default heirsSlice.reducer;
