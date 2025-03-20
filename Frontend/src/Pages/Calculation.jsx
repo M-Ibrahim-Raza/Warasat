@@ -20,7 +20,7 @@ const sendTestData = async (heirList, total_amount, dispatch) => {
 
   try {
     const response = await axios.post(
-      "http://127.0.0.1:5000/inheritance-calculator-2",
+      "http://127.0.0.1:8080/inheritance-calculator-2",
       {
         heir_list: heirList,
         total_amount: total_amount,
@@ -177,7 +177,7 @@ const Calculation = () => {
         ) : (
           <div className="flex justify-center">
             <div className="pl-16 flex w-3/4">
-              <PieChartComponent />
+              <PieChartComponent heirSharesList={heirSharesList} total_amount={total_amount} currency={currency}/>
             </div>
           </div>
         )}
