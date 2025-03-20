@@ -122,9 +122,7 @@ CORS(app)
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 def generate_answer(query, context):
-    """
-    Calls OpenAI GPT-4 to generate a response based on the given context.
-    """
+    
     prompt = f"Use the following information to answer the query:\n\n{context}\n\nQuery: {query}\nAnswer:"
 
     response = client.chat.completions.create(
@@ -136,7 +134,7 @@ def generate_answer(query, context):
         max_tokens=100
     )
 
-    return response.choices[0].message.content  # Extract the response text
+    return response.choices[0].message.content  
 
 @app.route("/get_answer", methods=["POST"])
 def get_answer():
@@ -150,13 +148,11 @@ def get_answer():
         if not query:
             return jsonify({"error": "Query is required"}), 400
 
-        # Retrieve context from Pinecone
         retrieved_context = query_pinecone(query, top_k=3)
 
-        # Generate AI response
         final_answer = generate_answer(query, retrieved_context)
 
-        return jsonify({"answer": final_answer})  # Return only the answer
+        return jsonify({"answer": final_answer})  
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
