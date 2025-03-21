@@ -11,6 +11,40 @@ import ViewToggle from "@/../Components/ViewToggle";
 import PieChartComponent from "@/../Components/PieChartComponent";
 import axios from "axios";
 import { useEffect } from "react";
+import Button from "@/../Components/Button";
+
+const handleDownloadPDF = async (
+  amount,
+  funeralExpenses,
+  mehr,
+  debt,
+  will,
+  currency,
+  gender,
+  heirSharesList
+) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/inheritance-calculation-pdf",
+      {
+        total_amount: amount,
+        funeral_expenses: funeralExpenses,
+        mehr: mehr,
+        debt: debt,
+        will: will,
+        currency: currency,
+        gender: gender,
+        heir_list: heirSharesList,
+      }
+    );
+
+    console.log("✅ PDF Generation Request Sent:", response.data);
+    alert("PDF generation request sent successfully!"); // Display success message
+  } catch (error) {
+    console.error("❌ Error:", error);
+    alert("Failed to generate PDF. Check the console for details.");
+  }
+};
 
 const sendTestData = async (heirList, total_amount, dispatch) => {
   if (!heirList || heirList.length === 0) {
@@ -38,11 +72,12 @@ const sendTestData = async (heirList, total_amount, dispatch) => {
     }
   } catch (error) {
     console.error("Error:", error);
+    dispatch(updateHeirSharesList([]));
   }
 };
 
 const Calculation = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
@@ -76,13 +111,13 @@ const Calculation = () => {
             mehr !== "" ||
             debt !== "" ||
             will !== "") && (
-              <DetailsDisplay>
-                <span>Total Asset Amount</span>
-                <span>
-                  {currency} {Number(amount).toLocaleString()}
-                </span>
-              </DetailsDisplay>
-            )}
+            <DetailsDisplay>
+              <span>Total Asset Amount</span>
+              <span>
+                {currency} {Number(amount).toLocaleString()}
+              </span>
+            </DetailsDisplay>
+          )}
           {funeralExpenses !== "" && (
             <DetailsDisplay className="text-TCR1 text-base">
               <span>Funeral & Burial Expenses</span>
@@ -137,6 +172,25 @@ const Calculation = () => {
               setViewToggle={setViewToggle}
             ></ViewToggle>
           </div>
+          <div
+            className="absolute top-0 right-0"
+            onClick={() => {
+              handleDownloadPDF(
+                amount,
+                funeralExpenses,
+                mehr,
+                debt,
+                will,
+                currency,
+                gender,
+                heirSharesList
+              );
+            }}
+          >
+            <Button className="!py-1 !text-md !mx-0" onClick>
+              Print PDF
+            </Button>
+          </div>
         </div>
         {viewToggle === 0 ? (
           <div class="overflow-x-auto border-2 border-TCT1 rounded-md">
@@ -150,50 +204,55 @@ const Calculation = () => {
                 </tr>
               </thead>
               <tbody>
-
-
                 {heirSharesList.map((heir, index) => {
-
                   let display_count = heir.val > 1 ? ` × ${heir.val}` : "";
-                  let amount_display_count = heir.val > 1 ? ` × ${heir.val} = ${formatNumber(heir.val*heir.amount)}` : "";
-                  let percentage_display_count = heir.val > 1
-                    ? ` × ${heir.val} = ${calculatePercentage(heir.val * heir.amount, total_amount)} %`
-                    : "";
+                  let amount_display_count =
+                    heir.val > 1
+                      ? ` × ${heir.val} = ${formatNumber(
+                          heir.val * heir.amount
+                        )}`
+                      : "";
+                  let percentage_display_count =
+                    heir.val > 1
+                      ? ` × ${heir.val} = ${calculatePercentage(
+                          heir.val * heir.amount,
+                          total_amount
+                        )} %`
+                      : "";
 
                   return (
                     <tr key={index} className="bg-TCLG-1">
                       <TableCell>{heir.relation + display_count}</TableCell>
                       <TableCell>{heir.category[1]}</TableCell>
-                      <TableCell>{calculatePercentage(heir.amount,total_amount)+" %" + percentage_display_count}</TableCell>
-                      <TableCell>{currency+" "+formatNumber(heir.amount)+amount_display_count}</TableCell>
+                      <TableCell>
+                        {calculatePercentage(heir.amount, total_amount) +
+                          " %" +
+                          percentage_display_count}
+                      </TableCell>
+                      <TableCell>
+                        {currency +
+                          " " +
+                          formatNumber(heir.amount) +
+                          amount_display_count}
+                      </TableCell>
                     </tr>
                   );
                 })}
-
-
               </tbody>
             </table>
           </div>
         ) : (
           <div className="flex justify-center">
             <div className="pl-16 flex w-3/4">
-              <PieChartComponent heirSharesList={heirSharesList} total_amount={total_amount} currency={currency}/>
+              <PieChartComponent
+                heirSharesList={heirSharesList}
+                total_amount={total_amount}
+                currency={currency}
+              />
             </div>
           </div>
         )}
       </div>
-      {/* Testing */}
-      {/* <ul>
-        {heirSharesList.map((heir, index) => (
-          <li key={index}>
-            <strong>Relation:</strong> {heir.relation} <br />
-            <strong>Category:</strong> {heir.category.join(", ")} <br />
-            <strong>Limit:</strong> {heir.limit} <br />
-            <strong>value:</strong> {heir.val} <br />
-            <strong>amount:</strong> {heir.amount}
-          </li>
-        ))}
-      </ul> */}
       <div className="w-full h-16"></div>
     </>
   );
