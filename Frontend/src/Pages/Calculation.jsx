@@ -13,6 +13,50 @@ import axios from "axios";
 import { useEffect } from "react";
 import Button from "@/../Components/Button";
 
+const handleDownloadExcel = async (
+  amount,
+  funeralExpenses,
+  mehr,
+  debt,
+  will,
+  currency,
+  gender,
+  heirSharesList
+) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/inheritance-calculation-xlsx", // Endpoint for Excel
+      {
+        total_amount: amount,
+        funeral_expenses: funeralExpenses,
+        mehr: mehr,
+        debt: debt,
+        will: will,
+        currency: currency,
+        gender: gender,
+        heir_list: heirSharesList,
+      },
+      { responseType: "blob" } // Important: Receive Excel as blob
+    );
+
+    console.log("✅ Excel Generation Request Sent Successfully");
+
+    // Create a downloadable link
+    const blob = new Blob([response.data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "Inheritance-Calculation.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Cleanup
+
+    alert("Excel downloaded successfully!");
+  } catch (error) {
+    console.error("❌ Error:", error);
+    alert("Failed to generate Excel file. Check the console for details.");
+  }
+};
+
 const handleDownloadPDF = async (
   amount,
   funeralExpenses,
@@ -35,16 +79,28 @@ const handleDownloadPDF = async (
         currency: currency,
         gender: gender,
         heir_list: heirSharesList,
-      }
+      },
+      { responseType: "blob" } // Important: Receive PDF as blob
     );
 
-    console.log("✅ PDF Generation Request Sent:", response.data);
-    alert("PDF generation request sent successfully!"); // Display success message
+    console.log("✅ PDF Generation Request Sent Successfully");
+
+    // Create a downloadable link
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "Inheritance-Calculation.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Cleanup
+
+    alert("PDF downloaded successfully!");
   } catch (error) {
     console.error("❌ Error:", error);
     alert("Failed to generate PDF. Check the console for details.");
   }
 };
+
 
 const sendTestData = async (heirList, total_amount, dispatch) => {
   if (!heirList || heirList.length === 0) {
@@ -174,6 +230,25 @@ const Calculation = () => {
           </div>
           <div
             className="absolute top-0 right-0"
+            onClick={() => {
+              handleDownloadExcel(
+                amount,
+                funeralExpenses,
+                mehr,
+                debt,
+                will,
+                currency,
+                gender,
+                heirSharesList
+              );
+            }}
+          >
+            <Button className="!py-1 !text-md !mx-0" onClick>
+              Print Excel
+            </Button>
+          </div>
+          <div
+            className="absolute top-10 right-0"
             onClick={() => {
               handleDownloadPDF(
                 amount,
