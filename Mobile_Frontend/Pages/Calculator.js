@@ -2,11 +2,11 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import Heading from "../../Frontend/Components/Heading";
-import RadioButton from "../../Frontend/Components/RadioButton";
-import OptionToggle from "../../Frontend/Components/OptionToggle";
-import ValInput from "../../Frontend/Components/ValInput";
-import Button from "../../Frontend/Components/Button";
+import Heading from "../Frontend/Components/Heading";
+import RadioButton from "../Frontend/Components/RadioButton";
+import OptionToggle from "../Frontend/Components/OptionToggle";
+import ValInput from "../Frontend/Components/ValInput";
+import Button from "../Frontend/Components/Button";
 import { 
   setAmount, 
   setFuneralExpenses, 

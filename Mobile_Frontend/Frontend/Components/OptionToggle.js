@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Switch } from '../src/components_ui/switch';
+import { Switch } from '../../components_ui/switch';
 
 const OptionToggle = ({ checked, onCheckedChange, children }) => {
   return (

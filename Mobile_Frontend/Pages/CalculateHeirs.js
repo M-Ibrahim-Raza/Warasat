@@ -16,12 +16,12 @@ import {
   parent_heirs_grouped,
 } from "../data/HeirsData";
 import { capitalizeWords } from "../lib/utils";
-import Heading from "../../Frontend/Components/Heading";
-import DetailsDisplay from "../../Frontend/Components/DetailsDisplay";
-import Button from "../../Frontend/Components/Button";
-import HeirInput from "../../Frontend/Components/HeirInput";
+import Heading from "../Frontend/Components/Heading";
+import DetailsDisplay from "../Frontend/Components/DetailsDisplay";
+import Button from "../Frontend/Components/Button";
+import HeirInput from "../Frontend/Components/HeirInput";
 import { Drawer } from "../components_ui/drawer";
-import HeirButton from "../../Frontend/Components/HeirButton";
+import HeirButton from "../Frontend/Components/HeirButton";
 
 export const CalculateHeirs = () => {
   const navigation = useNavigation();

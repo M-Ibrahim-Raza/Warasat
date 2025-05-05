@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Dimensions, StyleSheet } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
-import { capitalizeWords, calculatePercentage, formatNumber } from '../src/lib/utils';
+import { capitalizeWords, calculatePercentage, formatNumber } from '../../lib/utils';
 
 const PieChartComponent = ({ heirSharesList, total_amount, currency }) => {
   const [dimensions, setDimensions] = useState({

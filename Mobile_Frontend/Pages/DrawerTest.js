@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import HeirButton from "../../Frontend/Components/HeirButton";
-import Button from "../../Frontend/Components/Button";
+import HeirButton from "../Frontend/Components/HeirButton";
+import Button from "../Frontend/Components/Button";
 import { Drawer } from "../components_ui/drawer";
 
 const DrawerTest = () => {

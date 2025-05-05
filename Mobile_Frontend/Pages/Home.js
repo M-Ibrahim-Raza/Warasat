@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Button from "../../Frontend/Components/Button";
+import Button from "../Frontend/Components/Button";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -11,7 +11,7 @@ const Home = () => {
       <View style={styles.center}>
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../assets/images/Warasat Logo.png")}
+            source={require("../assets/WarasatLogo.png")}
             style={styles.logo}
             resizeMode="contain"
           />

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import PieChartComponent from "../../Frontend/Components/PieChartComponent";
+import PieChartComponent from "../Frontend/Components/PieChartComponent";
 
 const Test = () => {
   // Sample data for testing

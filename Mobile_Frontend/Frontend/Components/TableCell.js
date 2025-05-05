@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { capitalizeWords } from '../src/lib/utils';
+import { capitalizeWords } from '../../lib/utils';
 
 const TableCell = ({ children }) => {
   const displayText = typeof children === 'string' ? capitalizeWords(children) : children;

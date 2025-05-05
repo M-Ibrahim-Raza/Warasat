@@ -32,7 +32,7 @@ const Splash = () => {
           <View style={styles.logo}>
             <Image
               style={styles.logoImage}
-              source={require("../assets/images/Warasat Logo.png")}
+              // source={require("../assets/WarasatLogo.png")}
               resizeMode="contain"
             />
           </View>

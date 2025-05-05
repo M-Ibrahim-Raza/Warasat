@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useDispatch } from 'react-redux';
-import { setCurrency } from '../src/store/detailsSlice';
+import { setCurrency } from '../../store/detailsSlice';
 
 const ValInput = ({
   id,

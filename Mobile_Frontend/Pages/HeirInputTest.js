@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import HeirInput from '../../Frontend/Components/HeirInput';
+import HeirInput from '../Frontend/Components/HeirInput';
 
 const HeirInputTest = () => {
   const [val, setVal] = useState(1);
