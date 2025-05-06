@@ -5,7 +5,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     FatherShare, PerSonsSonsDaughterShare, MotherShare, FathersFatherShare, FathersMotherShare, MothersMotherShare, PerRealSisterShare, 
     PerPaternalSisterShare, PerMaternalSiblingShare, PerSonsSonShare, PerSonsSonsSonShare, PerRealBrotherShare, PerPaternalBrotherShare) :-
     % Step 1: Calculate fixed shares for husband/wives
-    calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth1),
+    calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumSonsSons, NumDaughters, NumSonsDaughters, HusbandShare, TotalWivesShare, RemainingWealth1),
 
     % Step 2: Calculate per wife share
     calculate_individual_share(TotalWivesShare, NumWives, PerWifeShare),
@@ -265,7 +265,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
 
 
 % Calculate fixed shares for husband/wives and remaining wealth
-calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters, HusbandShare, TotalWivesShare, RemainingWealth) :-
+calculate_fixed_shares(TotalWealth, HasHusband, NumWives, NumSons, NumSonsSons, NumDaughters, NumSonsDaughters, HusbandShare, TotalWivesShare, RemainingWealth) :-
     (HasHusband =:= 1 ->  % If husband is present
         (NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0 ->  % No children
             HusbandShare is TotalWealth / 2,  % Husband gets 1/2 if no children

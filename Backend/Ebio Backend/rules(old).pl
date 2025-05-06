@@ -358,3 +358,6 @@ calculate_paternal_siblings_shares(TotalWealth, NumPaternalBrothers, NumPaternal
 
 calculate_paternal_sister_share(TotalWealth, NumPaternalSisters, PaternalSistersShare) :-
     PaternalSistersShare is TotalWealth.
+
+
+Has_Father(HasFather).

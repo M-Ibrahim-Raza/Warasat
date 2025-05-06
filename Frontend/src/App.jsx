@@ -12,6 +12,7 @@ import ChatBot from "../Components/ChatBot";
 import Calculator from "./Pages/Calculator";
 import Test from "./Pages/Test";
 import Test2 from "./Pages/Test2";
+import Test3 from "./Pages/Test3";
 import { CalculateHeirs } from "./Pages/CalculateHeirs";
 import Calculation from "./Pages/Calculation";
 
@@ -39,6 +40,7 @@ const AppWrapper = () => {
           <Route path="/inheritance-calculation" element={<Calculation />} />
           <Route path="/test" element={<Test />}></Route>
           <Route path="/test2" element={<Test2 />}></Route>
+          <Route path="/test3" element={<Test3 />}></Route>
         </Routes>
       </body>
     </>
