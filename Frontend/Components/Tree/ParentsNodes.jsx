@@ -15,12 +15,20 @@ const ParentsNodes = ({ parentsData }) => {
     const root = d3.hierarchy(parentsData);
     treeLayout(root);
 
-    console.log(root.height)
 
     // Select the svg element and set its dimensions
     const svg = d3.select(svgRef.current)
       .attr("width", width)
       .attr("height", height);
+
+    let buffer = 43
+    if (root.children && root.children.length == 2 && root.children[0].children && root.children[0].children.length == 2) {
+      buffer = 0
+    }
+
+    if (root.children && root.children.length == 2 && root.children[0].children && root.children[0].children.length == 2 && !root.children[1].children) {
+      buffer = -18
+    }
 
     if (root.height === 2) {
 
@@ -30,7 +38,7 @@ const ParentsNodes = ({ parentsData }) => {
         .enter()
         .append('line')
         .attr('class', 'link')
-        .attr('x1', d => d.source.x)
+        .attr('x1', d => d.source.x+buffer)
         .attr('y1', d => {
           // Apply offset based on the target node's name
           if (d.source.data.name === "Deceased") {
@@ -40,7 +48,7 @@ const ParentsNodes = ({ parentsData }) => {
           }
         }
         )
-        .attr('x2', d => d.target.x)
+        .attr('x2', d => d.target.x+buffer)
         .attr('y2', d => {
           // Apply offset based on the target node's name
           if (d.target.depth == 2) {
@@ -59,12 +67,12 @@ const ParentsNodes = ({ parentsData }) => {
         .attr('class', 'node')
         .attr('transform', d => {
           if (d.data.name === "Deceased") {
-            return `translate(${d.x - 60},${d.y + 430})`
+            return `translate(${d.x - 60+buffer},${d.y + 430})`
           } else if (d.depth === 2) {
-            return `translate(${d.x - 60},${d.y - 290})`
+            return `translate(${d.x - 60+buffer},${d.y - 290})`
           }
           else {
-            return `translate(${d.x - 60},${d.y + 70})`
+            return `translate(${d.x - 60+buffer},${d.y + 70})`
           }
         });
 
@@ -102,12 +110,12 @@ const ParentsNodes = ({ parentsData }) => {
         .enter()
         .append('line')
         .attr('class', 'link')
-        .attr('x1', d => d.source.x)
+        .attr('x1', d => d.source.x+buffer)
         .attr('y1', d => {
             return d.source.y + 430;
         }
         )
-        .attr('x2', d => d.target.x)
+        .attr('x2', d => d.target.x+buffer)
         .attr('y2', d => {
           return d.target.y - 80; // Standard offset for other nodes
         })
@@ -122,10 +130,10 @@ const ParentsNodes = ({ parentsData }) => {
         .attr('class', 'node')
         .attr('transform', d => {
           if (d.data.name === "Deceased") {
-            return `translate(${d.x - 60},${d.y + 430})`
+            return `translate(${d.x - 60+buffer},${d.y + 430})`
           }
           else {
-            return `translate(${d.x - 60},${d.y -130})`
+            return `translate(${d.x - 60+buffer},${d.y -130})`
           }
         });
 

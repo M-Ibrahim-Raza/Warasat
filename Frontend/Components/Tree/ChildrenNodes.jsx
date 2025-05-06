@@ -20,6 +20,14 @@ const ChildrenNodes = ({ childrenData }) => {
       .attr("width", width)
       .attr("height", height);
 
+    // console.log(root.height)
+    // console.log(root.children[0].children.length)
+    
+    let buffer=0
+    if (root.children && root.children.length==2 && root.children[0].children && root.children[0].children.length==2){
+    buffer=-61
+    }
+
     if (root.height === 2) {
 
       // Create links
@@ -28,7 +36,7 @@ const ChildrenNodes = ({ childrenData }) => {
         .enter()
         .append('line')
         .attr('class', 'link')
-        .attr('x1', d => d.source.x)
+        .attr('x1', d => d.source.x+buffer)
         .attr('y1', d => {
           // Apply offset based on the source node's name
           if (d.source.data.name === "Deceased") {
@@ -38,7 +46,7 @@ const ChildrenNodes = ({ childrenData }) => {
           }
         }
         )
-        .attr('x2', d => d.target.x)
+        .attr('x2', d => d.target.x+buffer)
         .attr('y2', d => {
           // Apply offset based on the target node's name
           if (d.target.depth == 2) {
@@ -57,12 +65,12 @@ const ChildrenNodes = ({ childrenData }) => {
         .attr('class', 'node')
         .attr('transform', d => {
           if (d.data.name === "Deceased") {
-            return `translate(${d.x - 60},${d.y + 20})`
+            return `translate(${d.x - 60+buffer},${d.y + 20})`
           } else if (d.depth === 2) {
-            return `translate(${d.x - 60},${d.y - 60})`
+            return `translate(${d.x - 60+buffer},${d.y - 60})`
           }
           else {
-            return `translate(${d.x - 60},${d.y - 20})`
+            return `translate(${d.x - 60+buffer},${d.y - 20})`
           }
         });
 
@@ -164,7 +172,7 @@ const ChildrenNodes = ({ childrenData }) => {
   }, []);
 
   return (
-    <svg ref={svgRef} />
+      <svg ref={svgRef} />
   );
 };
 

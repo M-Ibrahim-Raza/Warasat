@@ -14,16 +14,23 @@ const Test2 = () => {
           { name: "Daughter", share: 10 }
         ]
       },
-      // { name: "Daughter", share: 30 },
+      { name: "Daughter", share: 30 },
     ]
   };
 
   const siblingsData = {
     name: "Deceased",
     children: [
-      { name: "Real Brother", share: 5 },
+      // { name: "Real Brother", share: 5 },
+      { name: "Real Sister", share: 5 },
+      // { name: "Real Sister", share: 5 }
+    ]
+  };
+
+  const spouseData = {
+    name: "Deceased",
+    children: [
       { name: "Wife", share: 10 },
-      { name: "Real Sister", share: 5 }
     ]
   };
 
@@ -47,7 +54,7 @@ const Test2 = () => {
   };
 
   return (
-<Tree childrenData={childrenData} parentsData={parentsData} siblingsData={siblingsData}></Tree>
+<Tree childrenData={childrenData} parentsData={parentsData} siblingsData={siblingsData} spouseData={spouseData}></Tree>
   )
 }
 
