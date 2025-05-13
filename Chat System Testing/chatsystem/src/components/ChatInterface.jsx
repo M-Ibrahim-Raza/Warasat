@@ -22,49 +22,8 @@ const ChatInterface = ({
   // Fetch messages from the server
   const fetchMessages = async () => {
     try {
-      // In a real app, this would fetch messages from the API
-      // For now, we'll use mock data if we're in ulema view
-      if (isUlemaView && chatId) {
-        const mockMessages = [
-          {
-            id: "msg-1",
-            sender: "user",
-            text: "Assalamu alaikum, I'd like to verify my inheritance calculation with you. I've attached the calculation files for your review.",
-            timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-            attachments: [
-              {
-                name: "Inheritance-Calculation.pdf",
-                type: "application/pdf",
-                url: "#",
-              },
-              {
-                name: "Inheritance-Calculation.xlsx",
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                url: "#",
-              },
-            ],
-          },
-          {
-            id: "msg-2",
-            sender: "ulema",
-            text: "Wa alaikum salam. Thank you for reaching out. I'll review your inheritance calculation and get back to you shortly.",
-            timestamp: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
-          },
-          {
-            id: "msg-3",
-            sender: "user",
-            text: "Thank you, Sheikh. I'm particularly concerned about the distribution between my sons and daughters.",
-            timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
-          },
-        ]
-        setMessages(mockMessages)
-        return
-      }
-
-      const response = await chatService.getMessages()
-      if (Array.isArray(response)) {
-        setMessages(response)
-      }
+      const fetchedMessages = await chatService.getMessages()
+      setMessages(fetchedMessages)
     } catch (error) {
       console.error("Error fetching messages:", error)
     }
@@ -75,36 +34,18 @@ const ChatInterface = ({
     try {
       setIsLoading(true)
 
-      // In a real app, this would send the message to the API
-      // await chatService.sendMessage(text)
-
-      // Add message to local state
-      const newMsg = {
-        id: `msg-${Date.now()}`,
-        sender: isUlemaView ? "ulema" : "user",
-        text,
-        timestamp: new Date(),
-        attachments,
-      }
-
-      setMessages((prev) => [...prev, newMsg])
-      setNewMessage("")
-
-      // Simulate response after a delay if we're not in ulema view
-      if (!isUlemaView) {
-        setTimeout(() => {
-          const responseMsg = {
-            id: `msg-${Date.now() + 1}`,
-            sender: "ulema",
-            text: `Thank you for your message. I'll review your inheritance calculation and get back to you shortly.`,
-            timestamp: new Date(),
-          }
-          setMessages((prev) => [...prev, responseMsg])
-          setIsLoading(false)
-        }, 2000)
+      // Send the message to the API
+      if (isUlemaView) {
+        await chatService.sendUlemaReply(text)
       } else {
-        setIsLoading(false)
+        await chatService.sendMessage(text, attachments)
       }
+
+      // Refresh messages from the server
+      await fetchMessages()
+
+      setNewMessage("")
+      setIsLoading(false)
     } catch (error) {
       console.error("Error sending message:", error)
       setIsLoading(false)
@@ -134,16 +75,19 @@ const ChatInterface = ({
   // Initial fetch of messages
   useEffect(() => {
     fetchMessages()
-  }, [isUlemaView, chatId])
+
+    // Set up polling to refresh messages every 3 seconds
+    const intervalId = setInterval(fetchMessages, 3000)
+
+    return () => clearInterval(intervalId)
+  }, [])
 
   // Send files automatically when the chat starts
   useEffect(() => {
     const sendInitialFiles = async () => {
-      const attachments = []
-      let initialMessage = `Assalamu alaikum, I'd like to verify my inheritance calculation with you.`
-
-      if (pdfFile || excelFile) {
-        initialMessage += ` I've attached the calculation files for your review.`
+      if (!isUlemaView && messages.length === 0 && (pdfFile || excelFile)) {
+        const attachments = []
+        const initialMessage = `Assalamu alaikum, I'd like to verify my inheritance calculation with you.`
 
         if (pdfFile) {
           attachments.push({
@@ -160,15 +104,13 @@ const ChatInterface = ({
             url: URL.createObjectURL(excelFile),
           })
         }
-      }
 
-      if (!isUlemaView && messages.length === 0) {
-        await sendMessage(initialMessage, attachments.length > 0 ? attachments : undefined)
+        await sendMessage(initialMessage, attachments)
       }
     }
 
     sendInitialFiles()
-  }, [pdfFile, excelFile, isUlemaView])
+  }, [pdfFile, excelFile, isUlemaView, messages.length])
 
   return (
     <div className="flex flex-col h-[600px]">
