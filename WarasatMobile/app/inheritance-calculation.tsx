@@ -15,8 +15,7 @@ import { updateHeirSharesList } from "../store/heirsSlice"
 import { formatNumber, calculatePercentage } from "../utils/utilities"
 import type { RootState } from "../store/store"
 import { Share as ShareIcon } from "lucide-react-native"
-import { Share } from 'react-native';
-
+import { Share } from 'react-native'; 
 
 export default function InheritanceCalculation() {
   const dispatch = useDispatch()
@@ -45,7 +44,7 @@ export default function InheritanceCalculation() {
     try {
       setLoading(true)
       const response = await axios.post(
-        "http://127.0.0.1:8080/inheritance-calculator-2",
+        "http://127.0.0.1:5000/inheritance-calculator-2",
         {
           heir_list: heirList,
           total_amount: total_amount,

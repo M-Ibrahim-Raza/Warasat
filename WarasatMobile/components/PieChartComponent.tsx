@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Dimensions } from "react-native"
 import { PieChart } from "react-native-chart-kit"
 import { formatNumber, calculatePercentage } from "../utils/utilities"
 import { capitalizeWords } from "../utils/utilities"
-import React from "react";
+import React from "react"
 
 interface HeirShare {
   relation: string
