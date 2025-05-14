@@ -6,12 +6,19 @@ interface Heir {
   limit: number
 }
 
+interface HeirShare extends Heir {
+  category: [string, string]
+  amount: number
+}
+
 interface HeirsState {
   heirList: Heir[]
+  heirSharesList: HeirShare[]
 }
 
 const initialState: HeirsState = {
   heirList: [],
+  heirSharesList: [],
 }
 
 const heirsSlice = createSlice({
@@ -37,8 +44,11 @@ const heirsSlice = createSlice({
     deleteHeir: (state, action: PayloadAction<Heir>) => {
       state.heirList = state.heirList.filter((heir) => heir.relation !== action.payload.relation)
     },
+    updateHeirSharesList: (state, action: PayloadAction<HeirShare[]>) => {
+      state.heirSharesList = action.payload
+    },
   },
 })
 
-export const { updateHeirList, decrementHeirVal, deleteHeir } = heirsSlice.actions
+export const { updateHeirList, decrementHeirVal, deleteHeir, updateHeirSharesList } = heirsSlice.actions
 export default heirsSlice.reducer

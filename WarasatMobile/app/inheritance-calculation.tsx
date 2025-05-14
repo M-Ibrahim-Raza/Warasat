@@ -1,18 +1,222 @@
-import { View, Text, StyleSheet, SafeAreaView } from "react-native"
+"use client"
+import { useState, useEffect } from "react"
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert, TouchableOpacity } from "react-native"
 import { Stack } from "expo-router"
+import { useSelector, useDispatch } from "react-redux"
+import axios from "axios"
 import Navbar from "../components/Navbar"
 import Heading from "../components/Heading"
+import DetailsDisplay from "../components/DetailsDisplay"
+import TableHeading from "../components/TableHeading"
+import TableCell from "../components/TableCell"
+import ViewToggle from "../components/ViewToggle"
+import PieChartComponent from "../components/PieChartComponent"
+import { updateHeirSharesList } from "../store/heirsSlice"
+import { formatNumber, calculatePercentage } from "../utils/utilities"
+import type { RootState } from "../store/store"
+import { Share as ShareIcon } from "lucide-react-native"
+import { Share } from 'react-native';
+
 
 export default function InheritanceCalculation() {
+  const dispatch = useDispatch()
+  const [viewToggle, setViewToggle] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  const amount = useSelector((state: RootState) => state.details.amount)
+  const funeralExpenses = useSelector((state: RootState) => state.details.funeralExpenses)
+  const mehr = useSelector((state: RootState) => state.details.mehr)
+  const debt = useSelector((state: RootState) => state.details.debt)
+  const will = useSelector((state: RootState) => state.details.will)
+  const currency = useSelector((state: RootState) => state.details.currency)
+  const gender = useSelector((state: RootState) => state.options.gender)
+  const heirList = useSelector((state: RootState) => state.heirs.heirList)
+  const heirSharesList = useSelector((state: RootState) => state.heirs.heirSharesList)
+
+  const total_amount = Number(amount) - Number(funeralExpenses) - Number(mehr) - Number(debt) - Number(will)
+
+  const sendDataToAPI = async () => {
+    if (!heirList || heirList.length === 0) {
+      Alert.alert("Error", "No heirs data to send.")
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+      const response = await axios.post(
+        "http://127.0.0.1:8080/inheritance-calculator-2",
+        {
+          heir_list: heirList,
+          total_amount: total_amount,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+
+      if (response.data && response.data.heir_list) {
+        dispatch(updateHeirSharesList(response.data.heir_list))
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      Alert.alert("Error", "Failed to calculate inheritance shares. Please try again.")
+      dispatch(updateHeirSharesList([]))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleShare = async () => {
+    try {
+      let message = "Islamic Inheritance Calculation\n\n"
+      message += `Total Asset Amount: ${currency} ${Number(amount).toLocaleString()}\n`
+      if (funeralExpenses) message += `Funeral Expenses: ${currency} ${Number(funeralExpenses).toLocaleString()}\n`
+      if (mehr) message += `Haq Mehr: ${currency} ${Number(mehr).toLocaleString()}\n`
+      if (debt) message += `Debt: ${currency} ${Number(debt).toLocaleString()}\n`
+      if (will) message += `Will: ${currency} ${Number(will).toLocaleString()}\n`
+      message += `Amount Distributed: ${currency} ${total_amount.toLocaleString()}\n\n`
+
+      message += "Heir Shares:\n"
+      heirSharesList.forEach((heir) => {
+        const displayCount = heir.val > 1 ? ` × ${heir.val}` : ""
+        const totalAmount = heir.val * heir.amount
+        message += `${heir.relation}${displayCount}: ${currency} ${formatNumber(totalAmount)} (${calculatePercentage(totalAmount, total_amount)}%)\n`
+      })
+
+      await Share.share({
+        message,
+        title: "Islamic Inheritance Calculation",
+      })
+    } catch (error) {
+      Alert.alert("Error", "Failed to share calculation results.")
+    }
+  }
+
+  useEffect(() => {
+    sendDataToAPI()
+  }, [])
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       <Navbar />
 
-      <View style={styles.content}>
-        <Heading>Inheritance Calculation</Heading>
-        <Text style={styles.subtitle}>This screen will display the inheritance calculation results</Text>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Heading>Islamic Inheritance Calculator</Heading>
+
+        <View style={styles.assetContainer}>
+          <Text style={styles.sectionTitle}>Asset Details</Text>
+
+          <View style={styles.detailsContainer}>
+            {(funeralExpenses !== "" || mehr !== "" || debt !== "" || will !== "") && (
+              <DetailsDisplay>
+                <Text>Total Asset Amount</Text>
+                <Text>
+                  {currency} {Number(amount).toLocaleString()}
+                </Text>
+              </DetailsDisplay>
+            )}
+
+            {funeralExpenses !== "" && (
+              <DetailsDisplay style={styles.expenseItem}>
+                <Text>Funeral & Burial Expenses</Text>
+                <Text>
+                  -{currency} {Number(funeralExpenses).toLocaleString()}
+                </Text>
+              </DetailsDisplay>
+            )}
+
+            {mehr !== "" && (
+              <DetailsDisplay style={styles.expenseItem}>
+                <Text>Haq Mehr</Text>
+                <Text>
+                  -{currency} {Number(mehr).toLocaleString()}
+                </Text>
+              </DetailsDisplay>
+            )}
+
+            {debt !== "" && (
+              <DetailsDisplay style={styles.expenseItem}>
+                <Text>Debt & Liabilities</Text>
+                <Text>
+                  -{currency} {Number(debt).toLocaleString()}
+                </Text>
+              </DetailsDisplay>
+            )}
+
+            {will !== "" && (
+              <DetailsDisplay style={styles.expenseItem}>
+                <Text>Will</Text>
+                <Text>
+                  -{currency} {Number(will).toLocaleString()}
+                </Text>
+              </DetailsDisplay>
+            )}
+
+            <DetailsDisplay>
+              <Text>Asset Amount To Be Distributed Among Heirs</Text>
+              <Text>
+                {currency} {total_amount.toLocaleString()}
+              </Text>
+            </DetailsDisplay>
+          </View>
+        </View>
+
+        <View style={styles.resultsContainer}>
+          <View style={styles.headerRow}>
+            <Text style={styles.resultsTitle}>Heir Shares</Text>
+            <ViewToggle viewToggle={viewToggle} setViewToggle={setViewToggle} />
+            <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+              <ShareIcon size={20} color="#003049" />
+            </TouchableOpacity>
+          </View>
+
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Calculating shares...</Text>
+            </View>
+          ) : viewToggle === 0 ? (
+            <View style={styles.tableContainer}>
+              <ScrollView horizontal>
+                <View style={styles.table}>
+                  <View style={styles.tableHeader}>
+                    <TableHeading>Relation</TableHeading>
+                    <TableHeading>Category</TableHeading>
+                    <TableHeading>Share</TableHeading>
+                    <TableHeading>Amount</TableHeading>
+                  </View>
+
+                  {heirSharesList.map((heir, index) => {
+                    const displayCount = heir.val > 1 ? ` × ${heir.val}` : ""
+                    const amountDisplayCount =
+                      heir.val > 1 ? ` × ${heir.val} = ${formatNumber(heir.val * heir.amount)}` : ""
+                    const percentageDisplayCount =
+                      heir.val > 1
+                        ? ` × ${heir.val} = ${calculatePercentage(heir.val * heir.amount, total_amount)} %`
+                        : ""
+
+                    return (
+                      <View key={index} style={styles.tableRow}>
+                        <TableCell>{heir.relation + displayCount}</TableCell>
+                        <TableCell>{heir.category[1]}</TableCell>
+                        <TableCell>
+                          {calculatePercentage(heir.amount, total_amount) + " %" + percentageDisplayCount}
+                        </TableCell>
+                        <TableCell>{currency + " " + formatNumber(heir.amount) + amountDisplayCount}</TableCell>
+                      </View>
+                    )
+                  })}
+                </View>
+              </ScrollView>
+            </View>
+          ) : (
+            <PieChartComponent heirSharesList={heirSharesList} total_amount={total_amount} currency={currency} />
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -22,16 +226,79 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#d8f3dc",
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    paddingBottom: 30,
+  },
+  assetContainer: {
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    borderRadius: 12,
+    marginHorizontal: "5%",
+    marginTop: 16,
+    padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#003049",
+    textAlign: "center",
+    marginVertical: 10,
+  },
+  detailsContainer: {
+    marginTop: 10,
+  },
+  expenseItem: {
+    backgroundColor: "rgba(255, 235, 235, 0.8)",
+  },
+  resultsContainer: {
+    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    borderRadius: 12,
+    marginHorizontal: "5%",
+    marginTop: 16,
+    padding: 16,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  resultsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#003049",
+  },
+  shareButton: {
+    padding: 8,
+    backgroundColor: "#e6f9e6",
+    borderRadius: 8,
+  },
+  loadingContainer: {
     padding: 20,
     alignItems: "center",
-    justifyContent: "center",
   },
-  subtitle: {
+  loadingText: {
     fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-    marginTop: 20,
+    color: "#666",
+  },
+  tableContainer: {
+    borderWidth: 1,
+    borderColor: "#006466",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  table: {
+    minWidth: "100%",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#e6f9e6",
+    borderBottomWidth: 1,
+    borderBottomColor: "#006466",
+  },
+  tableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    backgroundColor: "white",
   },
 })
