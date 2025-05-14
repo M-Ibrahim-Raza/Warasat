@@ -2,13 +2,12 @@ import { View, Text, StyleSheet, Dimensions } from "react-native"
 import { PieChart } from "react-native-chart-kit"
 import { formatNumber, calculatePercentage } from "../utils/utilities"
 import { capitalizeWords } from "../utils/utilities"
-import React from "react"
 
 interface HeirShare {
   relation: string
   val: number
   limit: number
-  category: [string, string]
+  category?: [string, string] | string | undefined
   amount: number
 }
 
@@ -29,6 +28,18 @@ const PieChartComponent = ({ heirSharesList, total_amount, currency }: PieChartC
       color += letters[Math.floor(Math.random() * 16)]
     }
     return color
+  }
+
+  // Helper function to safely get category
+  const getCategoryName = (heir: HeirShare) => {
+    if (!heir.category) return "N/A"
+    if (Array.isArray(heir.category) && heir.category.length > 1) {
+      return heir.category[1]
+    }
+    if (typeof heir.category === "string") {
+      return heir.category
+    }
+    return "N/A"
   }
 
   // Prepare data for the pie chart

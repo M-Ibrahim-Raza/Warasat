@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert, TouchableOpacity } from "react-native"
 import { Stack } from "expo-router"
 import { useSelector, useDispatch } from "react-redux"
@@ -14,7 +14,7 @@ import PieChartComponent from "../components/PieChartComponent"
 import { updateHeirSharesList } from "../store/heirsSlice"
 import { formatNumber, calculatePercentage } from "../utils/utilities"
 import type { RootState } from "../store/store"
-import { Share as ShareIcon } from "lucide-react-native"
+import { Share as ShareIcon} from "lucide-react-native"
 import { Share } from 'react-native'; 
 
 export default function InheritanceCalculation() {
@@ -43,8 +43,10 @@ export default function InheritanceCalculation() {
 
     try {
       setLoading(true)
+      // For development on a physical device, you'll need to use your computer's local network IP
+      // instead of localhost or 127.0.0.1
       const response = await axios.post(
-        "http://127.0.0.1:5000/inheritance-calculator-2",
+        "http://127.0.0.1:8080/inheritance-calculator-2", // Replace with your actual IP address
         {
           heir_list: heirList,
           total_amount: total_amount,
@@ -55,6 +57,8 @@ export default function InheritanceCalculation() {
           },
         },
       )
+
+      console.log("API Response:", response.data)
 
       if (response.data && response.data.heir_list) {
         dispatch(updateHeirSharesList(response.data.heir_list))
@@ -97,6 +101,12 @@ export default function InheritanceCalculation() {
   useEffect(() => {
     sendDataToAPI()
   }, [])
+
+  // Helper function to safely get category
+  const getCategoryName = (heir: any): string => {
+  return heir.category;
+}
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -200,7 +210,7 @@ export default function InheritanceCalculation() {
                     return (
                       <View key={index} style={styles.tableRow}>
                         <TableCell>{heir.relation + displayCount}</TableCell>
-                        <TableCell>{heir.category[1]}</TableCell>
+                        <TableCell>{getCategoryName(heir)}</TableCell>
                         <TableCell>
                           {calculatePercentage(heir.amount, total_amount) + " %" + percentageDisplayCount}
                         </TableCell>
