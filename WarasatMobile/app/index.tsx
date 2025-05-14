@@ -17,32 +17,34 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.globeIcon}>
-          <Image source={require("../assets/globe-icon.png")} style={{ width: 24, height: 24 }} />
+          <Image source={require("../assets/globe.png")} style={{ width: 24, height: 24 }} />
         </TouchableOpacity>
       </View>
 
       {/* Main Content */}
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <Image source={require("../assets/warasat-logo.png")} style={styles.logo} resizeMode="contain" />
+          <Image source={require("../assets/WarasatLogo.png")} style={styles.logo} resizeMode="contain" />
           <Text style={styles.title}>Warasat</Text>
         </View>
 
         <View style={styles.buttonsContainer}>
-          <Link href="/inheritance-calculator" asChild>
-            <CustomButton style={styles.mainButton}>Islamic Inheritance Calculator</CustomButton>
-          </Link>
+        <Link href={"/inheritance-calculator" as any} asChild>
+          <CustomButton style={styles.mainButton}>Islamic Inheritance Calculator</CustomButton>
+        </Link>
+
 
           <View style={styles.smallButtonsRow}>
-            <Link href="/ayahs" asChild>
-              <CustomButton style={styles.smallButton}>Ayahs</CustomButton>
+            <Link href={"/ayahs" as any} asChild>
+              <CustomButton style={styles.mainButton}>Ayahs</CustomButton>
             </Link>
 
-            <Link href="/hadiths" asChild>
+
+            <Link href={"/hadiths" as any} asChild>
               <CustomButton style={styles.smallButton}>Hadiths</CustomButton>
             </Link>
 
-            <Link href="/info" asChild>
+            <Link href={"/info" as any} asChild>
               <CustomButton style={styles.smallButton}>Info</CustomButton>
             </Link>
           </View>
