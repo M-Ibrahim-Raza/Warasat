@@ -13,9 +13,9 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     % Step 3: Daughters if no sons are present
     (NumSons =:= 0, NumDaughters > 0 ->
         (NumDaughters =:= 1 ->  % Only 1 daughter
-            DaughtersShare1 is RemainingWealth1 / 2  % She gets 1/2
+            DaughtersShare1 is TotalWealth / 2  % She gets 1/2
         ;
-            DaughtersShare1 is (RemainingWealth1 * 2 / 3)  % More than 1 daughter, they get 2/3
+            DaughtersShare1 is (TotalWealth * 2 / 3)  % More than 1 daughter, they get 2/3
         ),
         SonsShare1 = 0
     ;
@@ -29,13 +29,13 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         SonsDaughtersShare1 = 0
     ;
         (NumDaughters =:= 1 ->  % 1 daughter present
-            SonsDaughtersShare1 is RemainingWealth2 / 6  % 1/6 share
+            SonsDaughtersShare1 is TotalWealth / 6  % 1/6 share
         ;
             (NumSonsDaughters =:= 1 ->
-                SonsDaughtersShare1 is RemainingWealth2 / 2  % 1/2 if only one son's daughter
+                SonsDaughtersShare1 is TotalWealth / 2  % 1/2 if only one son's daughter
             ;
                 (NumSonsDaughters >= 2 ->
-                    SonsDaughtersShare1 is (RemainingWealth2 * 2 / 3)  % 2/3 if two or more
+                    SonsDaughtersShare1 is (TotalWealth * 2 / 3)  % 2/3 if two or more
                 ;
                     SonsDaughtersShare1 = 0
                 )
@@ -47,13 +47,13 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
 
     % Step 5: Son's Son's Daughter
     ( (NumSonsSonsDaughters >= 2, NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0, NumSonsSonsSons =:= 0) ->
-        SonsSonsDaughtersShare1 is RemainingWealth3 * 2 / 3  % 2/3 share
+        SonsSonsDaughtersShare1 is TotalWealth * 2 / 3  % 2/3 share
     ;
         ( (NumSonsSonsDaughters =:= 1, NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0, NumSonsSonsSons =:= 0) ->
-            SonsSonsDaughtersShare1 is RemainingWealth3 / 2  % 1/2 share
+            SonsSonsDaughtersShare1 is TotalWealth / 2  % 1/2 share
         ;
             ( (NumDaughters =:= 1; NumSonsDaughters =:= 1), NumSons =:= 0, NumSonsSons =:= 0, NumSonsSonsSons =:= 0 ->
-                SonsSonsDaughtersShare1 is RemainingWealth3 / 6  % 1/6 share
+                SonsSonsDaughtersShare1 is TotalWealth / 6  % 1/6 share
             ;
                 SonsSonsDaughtersShare1 = 0  % No share otherwise
             )
@@ -67,7 +67,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         ( (NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0) ->    % no children, no share
             FatherShare1 is 0
             ;
-            FatherShare1 is RemainingWealth4 / 6
+            FatherShare1 is TotalWealth / 6
         )
     ;
         FatherShare1 is 0
@@ -79,12 +79,12 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
         (((NumSons > 0 ; NumDaughters > 0 ; NumSonsSons > 0 ; NumSonsDaughters > 0) ;   % children condition
             (NumRealBrothers + NumRealSisters + NumPaternalBrothers + NumPaternalSisters + NumMaternalSiblings) >= 2 ;  % ikhwa condition
             (HasHusband =:= 1 , HasFather =:= 1)) ->
-                MotherShare is RemainingWealth5 / 6
+                MotherShare is TotalWealth / 6
         ;
             ((NumWives > 0 , HasFather =:= 1) -> 
-                MotherShare is RemainingWealth5 / 4
+                MotherShare is TotalWealth / 4
             ;
-                MotherShare is RemainingWealth5 / 3 
+                MotherShare is TotalWealth / 3 
             )
         )
     ;
@@ -95,7 +95,7 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     % Step 8: Father's Father Share
     (HasFathersFather=:=1 ->
         (((NumSons > 0 ; NumDaughters > 0 ; NumSonsSons > 0 ; NumSonsDaughters > 0) , (HasFather =:= 0)) ->   % children should be there and no father
-        FathersFatherShare1 is RemainingWealth6 / 6
+        FathersFatherShare1 is TotalWealth / 6
     ;
         FathersFatherShare1 is 0
     )
@@ -109,18 +109,18 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
 
     (HasFathersMother =:= 1, HasMother =:= 0, HasFather =:= 0 ->
     (HasMothersMother =:= 1, HasMother =:= 0 ->
-        GrandmothersShare is RemainingWealth7 / 6,
+        GrandmothersShare is TotalWealth / 6,
         FathersMotherShare is GrandmothersShare / 2,
         MothersMotherShare is GrandmothersShare / 2
     ;
-        FathersMotherShare is RemainingWealth7 / 6
+        FathersMotherShare is TotalWealth / 6
     )
     ;
     FathersMotherShare is 0
     ),
 
     (HasMothersMother =:= 1, HasMother =:= 0, HasFathersMother =:= 0 ->
-        MothersMotherShare is RemainingWealth7 / 6
+        MothersMotherShare is TotalWealth / 6
     ;
     MothersMotherShare is 0
     ),
@@ -131,9 +131,9 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     % Step 11: Real Sister
     (NumRealSisters > 0, NumSons =:= 0, NumDaughters =:= 0, NumSonsSons =:= 0, NumSonsDaughters =:= 0, HasFather =:= 0, HasFathersFather =:= 0, NumRealBrothers =:= 0 ->
         (NumRealSisters =:= 1 ->
-            RealSistersShare1 is RemainingWealth8 / 2
+            RealSistersShare1 is TotalWealth / 2
         ;
-        RealSistersShare1 is RemainingWealth8 * 2 / 3
+        RealSistersShare1 is TotalWealth * 2 / 3
         )
     ;
     RealSistersShare1 is 0
@@ -150,16 +150,16 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
     ;
         (NumRealSisters =:= 1) ->
             ( (NumSons =:= 0, NumSonsSons =:= 0,NumDaughters =:= 0,NumSonsDaughters =:= 0, HasFather =:= 0, HasFathersFather =:= 0, NumRealBrothers =:= 0, NumPaternalBrothers =:= 0) ->
-                PaternalSistersShare1 is RemainingWealth9 / 6 
+                PaternalSistersShare1 is TotalWealth / 6 
             ;
                 PaternalSistersShare1 is 0
             )
     ;
         (NumPaternalSisters =:= 1, NumRealSisters =:= 0) ->
-            PaternalSistersShare1 is RemainingWealth9 / 2 
+            PaternalSistersShare1 is TotalWealth / 2 
     ;
         (NumPaternalSisters > 1, NumRealSisters =:= 0) ->
-            PaternalSistersShare1 is RemainingWealth9 * 2 / 3 
+            PaternalSistersShare1 is TotalWealth * 2 / 3 
     ;
         PaternalSistersShare1 is 0 
         )
@@ -176,9 +176,9 @@ inheritance_calculator(TotalWealth, HasHusband, NumWives, NumSons, NumDaughters,
             MaternalSiblingShare is 0
             ;
             ((NumMaternalSiblings =:=1 )->
-                MaternalSiblingShare is RemainingWealth10 / 6
+                MaternalSiblingShare is TotalWealth / 6
                 ;
-                MaternalSiblingShare is RemainingWealth10 / 3
+                MaternalSiblingShare is TotalWealth / 3
             )
         )
         ;
