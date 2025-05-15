@@ -167,7 +167,7 @@ export default function InheritanceCalculation() {
             )}
 
             <DetailsDisplay>
-              <Text>Asset Amount To Be Distributed Among Heirs</Text>
+              <Text>Asset To Be Distributed</Text>
               <Text>
                 {currency} {total_amount.toLocaleString()}
               </Text>
@@ -210,7 +210,10 @@ export default function InheritanceCalculation() {
 
                     return (
                       <View key={index} style={styles.tableRow}>
-                        <TableCell>{heir.relation + displayCount}</TableCell>
+                        <TableCell style={{ minWidth: 140, textAlign: "center" }}>
+                          {heir.relation + displayCount}
+                        </TableCell>
+
                         <TableCell>{getCategoryName(heir)}</TableCell>
                         <TableCell>
                           {calculatePercentage(heir.amount, total_amount) + " %" + percentageDisplayCount}
