@@ -189,7 +189,7 @@ export default function InheritanceCalculatorHeirs() {
             )}
 
             <DetailsDisplay>
-              <Text>Asset Amount To Be Distributed Among Heirs</Text>
+              <Text>Asset To Be Distributed</Text>
               <Text>
                 {currency} {total_amount.toLocaleString()}
               </Text>
