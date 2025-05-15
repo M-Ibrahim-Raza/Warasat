@@ -1,10 +1,40 @@
+"use client"
 import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native"
-import { Link } from "expo-router"
+import { Link, router } from "expo-router"
+import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import CustomButton from "../components/CustomButton"
 import Navbar from "../components/Navbar"
 import ChatBot from "../components/ChatBot"
+import type { RootState } from "../store/store"
 
 export default function HomeScreen() {
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Use a timeout to ensure navigation happens after component is mounted
+    const timer = setTimeout(() => {
+      if (!isAuthenticated) {
+        router.replace("/login")
+      }
+      setIsLoading(false)
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [isAuthenticated])
+
+  // Show loading or nothing while checking authentication
+  if (isLoading || !isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -15,6 +45,7 @@ export default function HomeScreen() {
         <View style={styles.logoContainer}>
           <Image source={require("../assets/WarasatLogo.png")} style={styles.logo} resizeMode="contain" />
           <Text style={styles.title}>Warasat</Text>
+          {user && <Text style={styles.welcomeText}>Welcome, {user.name}</Text>}
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -68,6 +99,11 @@ const styles = StyleSheet.create({
     color: "#003049", // Dark blue
     marginTop: 10,
   },
+  welcomeText: {
+    fontSize: 18,
+    color: "#006466",
+    marginTop: 5,
+  },
   buttonsContainer: {
     alignItems: "center",
     marginBottom: 40,
@@ -85,5 +121,14 @@ const styles = StyleSheet.create({
   },
   smallButton: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#003049",
   },
 })

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert, TouchableOpacity } from "react-native"
 import { Stack } from "expo-router"
 import { useSelector, useDispatch } from "react-redux"
@@ -14,13 +14,15 @@ import PieChartComponent from "../components/PieChartComponent"
 import { updateHeirSharesList } from "../store/heirsSlice"
 import { formatNumber, calculatePercentage } from "../utils/utilities"
 import type { RootState } from "../store/store"
-import { Share as ShareIcon} from "lucide-react-native"
-import { Share } from 'react-native'; 
+import { Share as ShareIcon } from "lucide-react-native"
+import { Share } from "react-native"
+import { useRouter } from "expo-router"
 
 export default function InheritanceCalculation() {
   const dispatch = useDispatch()
   const [viewToggle, setViewToggle] = useState(0)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   const amount = useSelector((state: RootState) => state.details.amount)
   const funeralExpenses = useSelector((state: RootState) => state.details.funeralExpenses)
@@ -104,9 +106,8 @@ export default function InheritanceCalculation() {
 
   // Helper function to safely get category
   const getCategoryName = (heir: any): string => {
-  return heir.category;
-}
-
+    return heir.category
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -225,6 +226,13 @@ export default function InheritanceCalculation() {
             <PieChartComponent heirSharesList={heirSharesList} total_amount={total_amount} currency={currency} />
           )}
         </View>
+        {heirSharesList.length > 0 && (
+          <View style={styles.verifyContainer}>
+            <TouchableOpacity style={styles.verifyButton} onPress={() => router.push("/ulema-verification" as any)}>
+              <Text style={styles.verifyButtonText}>Verify with Ulema</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   )
@@ -309,5 +317,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
     backgroundColor: "white",
+  },
+  verifyContainer: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  verifyButton: {
+    backgroundColor: "#003049",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  verifyButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 8,
   },
 })
