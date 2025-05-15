@@ -189,42 +189,43 @@ export default function InheritanceCalculation() {
               <Text style={styles.loadingText}>Calculating shares...</Text>
             </View>
           ) : viewToggle === 0 ? (
-            <View style={styles.tableContainer}>
-              <ScrollView horizontal>
-                <View style={styles.table}>
-                  <View style={styles.tableHeader}>
-                    <TableHeading>Relation</TableHeading>
-                    <TableHeading>Category</TableHeading>
-                    <TableHeading>Share</TableHeading>
-                    <TableHeading>Amount</TableHeading>
-                  </View>
+            // Updated table section for InheritanceCalculation.tsx
 
-                  {heirSharesList.map((heir, index) => {
-                    const displayCount = heir.val > 1 ? ` × ${heir.val}` : ""
-                    const amountDisplayCount =
-                      heir.val > 1 ? ` × ${heir.val} = ${formatNumber(heir.val * heir.amount)}` : ""
-                    const percentageDisplayCount =
-                      heir.val > 1
-                        ? ` × ${heir.val} = ${calculatePercentage(heir.val * heir.amount, total_amount)} %`
-                        : ""
+// Updated table section without Category column
 
-                    return (
-                      <View key={index} style={styles.tableRow}>
-                        <TableCell style={{ minWidth: 140, textAlign: "center" }}>
-                          {heir.relation + displayCount}
-                        </TableCell>
+<View style={styles.tableContainer}>
+  <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+    <View style={styles.table}>
+      <View style={styles.tableHeader}>
+        <TableHeading width={160}>Relation</TableHeading>
+        <TableHeading width={140}>Share</TableHeading>
+        <TableHeading width={180}>Amount</TableHeading>
+      </View>
 
-                        <TableCell>{getCategoryName(heir)}</TableCell>
-                        <TableCell>
-                          {calculatePercentage(heir.amount, total_amount) + " %" + percentageDisplayCount}
-                        </TableCell>
-                        <TableCell>{currency + " " + formatNumber(heir.amount) + amountDisplayCount}</TableCell>
-                      </View>
-                    )
-                  })}
-                </View>
-              </ScrollView>
-            </View>
+      {heirSharesList.map((heir, index) => {
+        const displayCount = heir.val > 1 ? ` × ${heir.val}` : ""
+        const amountDisplayCount =
+          heir.val > 1 ? ` × ${heir.val} = ${formatNumber(heir.val * heir.amount)}` : ""
+        const percentageDisplayCount =
+          heir.val > 1
+            ? ` × ${heir.val} = ${calculatePercentage(heir.val * heir.amount, total_amount)} %`
+            : ""
+
+        return (
+          <View key={index} style={styles.tableRow}>
+            <TableCell width={160}>
+              {heir.relation + displayCount}
+            </TableCell>
+            <TableCell width={140}>
+              {calculatePercentage(heir.amount, total_amount) + " %" + percentageDisplayCount}
+            </TableCell>
+            <TableCell width={180}>{currency + " " + formatNumber(heir.amount) + amountDisplayCount}</TableCell>
+          </View>
+        )
+      })}
+    </View>
+  </ScrollView>
+          </View>
           ) : (
             <PieChartComponent heirSharesList={heirSharesList} total_amount={total_amount} currency={currency} />
           )}
@@ -301,26 +302,27 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   tableContainer: {
-    borderWidth: 1,
-    borderColor: "#006466",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  table: {
-    minWidth: "100%",
-  },
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: "#e6f9e6",
-    borderBottomWidth: 1,
-    borderBottomColor: "#006466",
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    backgroundColor: "white",
-  },
+  borderWidth: 1,
+  borderColor: "#006466",
+  borderRadius: 8,
+  overflow: "hidden",
+  marginBottom: 10,
+},
+table: {
+  // minWidth is removed as we're now using fixed widths
+},
+tableHeader: {
+  flexDirection: "row",
+  backgroundColor: "#e6f9e6",
+  borderBottomWidth: 1,
+  borderBottomColor: "#006466",
+},
+tableRow: {
+  flexDirection: "row",
+  borderBottomWidth: 1,
+  borderBottomColor: "#e0e0e0",
+  backgroundColor: "white",
+},
   verifyContainer: {
     alignItems: "center",
     marginTop: 20,
