@@ -1,19 +1,19 @@
 "use client"
 
+import { MessageCircle, Send } from "lucide-react-native"
 import { useState } from "react"
 import {
-  View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
+  View,
 } from "react-native"
-import { MessageCircle, Send } from "lucide-react-native"
 
 interface Message {
   sender: "user" | "bot"
@@ -34,7 +34,7 @@ const ChatBot = () => {
     setMessages((prev) => [...prev, userMessage])
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/get_answer", {
+      const response = await fetch("http://192.168.18.7:5000/get_answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),

@@ -1,22 +1,20 @@
 "use client"
-import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Alert, TouchableOpacity } from "react-native"
-import { Stack } from "expo-router"
-import { useSelector, useDispatch } from "react-redux"
 import axios from "axios"
-import Navbar from "../components/Navbar"
-import Heading from "../components/Heading"
-import DetailsDisplay from "../components/DetailsDisplay"
-import TableHeading from "../components/TableHeading"
-import TableCell from "../components/TableCell"
-import ViewToggle from "../components/ViewToggle"
-import PieChartComponent from "../components/PieChartComponent"
-import { updateHeirSharesList } from "../store/heirsSlice"
-import { formatNumber, calculatePercentage } from "../utils/utilities"
-import type { RootState } from "../store/store"
+import { Stack, useRouter } from "expo-router"
 import { Share as ShareIcon } from "lucide-react-native"
-import { Share } from "react-native"
-import { useRouter } from "expo-router"
+import { useEffect, useState } from "react"
+import { Alert, SafeAreaView, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { useDispatch, useSelector } from "react-redux"
+import DetailsDisplay from "../components/DetailsDisplay"
+import Heading from "../components/Heading"
+import Navbar from "../components/Navbar"
+import PieChartComponent from "../components/PieChartComponent"
+import TableCell from "../components/TableCell"
+import TableHeading from "../components/TableHeading"
+import ViewToggle from "../components/ViewToggle"
+import { updateHeirSharesList } from "../store/heirsSlice"
+import type { RootState } from "../store/store"
+import { calculatePercentage, formatNumber } from "../utils/utilities"
 
 export default function InheritanceCalculation() {
   const dispatch = useDispatch()
@@ -48,7 +46,7 @@ export default function InheritanceCalculation() {
       // For development on a physical device, you'll need to use your computer's local network IP
       // instead of localhost or 127.0.0.1
       const response = await axios.post(
-        "http://127.0.0.1:8080/inheritance-calculator-2", // Replace with your actual IP address
+        "http://192.168.18.7:8080/inheritance-calculator-2", // Replace with your actual IP address
         {
           heir_list: heirList,
           total_amount: total_amount,
