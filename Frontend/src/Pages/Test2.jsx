@@ -5,7 +5,8 @@ const Test2 = () => {
 
   // Sample tree data
   const childrenData = {
-    name: "Deceased",
+    name: "Deceased"
+    ,
     children: [
       {
         name: "Son", share: 10,

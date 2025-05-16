@@ -6,18 +6,18 @@ import SpouseNodes from './SpouseNodes'
 
 const Tree = ({childrenData,siblingsData,parentsData,spouseData}) => {
   return (
-    <div className='relative'>
-      <div className='absolute top-[310px] right-[475px]'>
+    <div className='tree relative mt-64 w-full h-[15rem]'>
+      <div className='absolute -top-[50px] right-[275px]'>
       <ChildrenNodes childrenData={childrenData}></ChildrenNodes>
       </div>
-      <div className='absolute top-[310px] right-[400px]'>
+      <div className='absolute -top-[50px] right-[200px]'>
       <SiblingsNodes siblingsData={siblingsData}></SiblingsNodes>
       </div>
-      <div className='absolute top-[310px] right-[400px]'>
+      <div className='absolute -top-[50px] right-[200px]'>
         <SpouseNodes spouseData={spouseData}>
       </SpouseNodes>
       </div>
-      <div className='absolute -top-[100px] right-[518px]'>
+      <div className='absolute -top-[460px] right-[318px]'>
       <ParentsNodes parentsData={parentsData}></ParentsNodes>
       </div>
     </div>

@@ -4,6 +4,7 @@ import Heading from "../../Components/Heading";
 import RadioButton from "../../Components/RadioButton";
 import OptionToggle from "../../Components/OptionToggle";
 import ValInput from "../../Components/ValInput";
+import PercentageInput from "../../Components/PercentageInput";
 import Button from "../../Components/Button";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -119,7 +120,17 @@ const Calculator = () => {
 
           {distributionMethod === "amount" && debtOption && <ValInput className="debt-input" id="debt" value={debt} placeholder="Enter Debt & Liabilities" label="Debt & Liabilities" onChange={(e) => dispatch(setDebt((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
 
-          {willOption && <ValInput className="will-input" id="will" value={will} placeholder="Enter Will Amount" label="Will" onChange={(e) => dispatch(setWill((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput>}
+          {willOption && 
+          (distributionMethod === "amount" ? <ValInput className="will-input" id="will" value={will} placeholder="Enter Will Amount" label="Will" onChange={(e) => dispatch(setWill((Number(e.target.value.replace(/,/g, "")))))} currency={currency} ></ValInput> :
+            <PercentageInput
+              id="will"
+              value={will}
+              placeholder="Enter Will Percentage"
+              label="Will"
+              onChange={(val) => dispatch(setWill(val))}
+            />
+          )
+        }
 
           <Link to='/inheritance-calculator-heirs'>
             <Button className="mt-6 !py-2">Proceed to Next Step &gt;</Button>

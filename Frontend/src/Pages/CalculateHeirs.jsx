@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { setAmount, setFuneralExpenses, setMehr, setDebt, setWill } from "../store/detailsSlice";
 import {
   updateHeirList,
   decrementHeirVal,
@@ -36,6 +37,7 @@ export const CalculateHeirs = () => {
   const [heirType, setHeirType] = useState("");
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
+  const distributionMethod=useSelector((state)=>state.options.distributionMethod)
   const mehr = useSelector((state) => state.details.mehr);
   const debt = useSelector((state) => state.details.debt);
   const will = useSelector((state) => state.details.will);
@@ -43,6 +45,11 @@ export const CalculateHeirs = () => {
   const gender = useSelector((state) => state.options.gender);
   const heirList = useSelector((state) => state.heirs.heirList);
 
+  if (distributionMethod=="percentage"){
+    dispatch(setAmount(100))
+  }
+
+  console.log(distributionMethod)
   const total_amount = amount - funeralExpenses - mehr - debt - will;
 
   const common_heirs_filtered = common_heirs.filter(
@@ -76,12 +83,19 @@ export const CalculateHeirs = () => {
             mehr !== "" ||
             debt !== "" ||
             will !== "") && (
+              distributionMethod==="amount"?
             <DetailsDisplay>
-              <span>Total Asset Amount</span>
+              <span>Total Asset</span>
               <span>
                 {currency} {Number(amount).toLocaleString()}
               </span>
-            </DetailsDisplay>
+            </DetailsDisplay>:
+              <DetailsDisplay>
+                <span>Total Asset</span>
+                <span>
+                {`${Number(amount)} %`}
+                </span>
+              </DetailsDisplay>
           )}
           {funeralExpenses !== "" && (
             <DetailsDisplay className="text-TCR1 text-base">
@@ -108,18 +122,30 @@ export const CalculateHeirs = () => {
             </DetailsDisplay>
           )}
           {will !== "" && (
+            distributionMethod==="amount"?
             <DetailsDisplay className="text-TCR1 text-base">
               <span>Will</span>
               <span>
                 -{currency} {Number(will).toLocaleString()}
               </span>
-            </DetailsDisplay>
+            </DetailsDisplay>:
+              <DetailsDisplay className="text-TCR1 text-base">
+                <span>Will</span>
+                <span>
+                {`${Number(will)} %`}
+                </span>
+              </DetailsDisplay>
           )}
           <DetailsDisplay>
-            <span>Asset Amount To Be Distributed Among Heirs</span>
+            <span>Asset To Be Distributed Among Heirs</span>
+              {distributionMethod==="amount"?
             <span>
               {currency} {Number(total_amount).toLocaleString()}
             </span>
+              :
+            <span>
+            {`${Number(total_amount)} %`}
+            </span>}
           </DetailsDisplay>
         </div>
       </div>

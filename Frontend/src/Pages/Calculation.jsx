@@ -1,18 +1,23 @@
-import React from "react";
-import Heading from "../../Components/Heading";
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { updateHeirSharesList } from "@/store/heirsSlice";
-import { calculatePercentage, formatNumber } from "@/Utilities/utilities";
-import DetailsDisplay from "../../Components/DetailsDisplay";
-import TableHeading from "@/../Components/Table/TableHeading";
-import TableCell from "@/../Components/Table/TableCell";
-import ViewToggle from "@/../Components/ViewToggle";
-import PieChartComponent from "@/../Components/PieChartComponent";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useEffect } from "react";
-import Button from "@/../Components/Button";
+import { useSelector, useDispatch } from "react-redux";
 
+import { updateHeirSharesList } from "@/store/heirsSlice";
+import { calculatePercentage, formatNumber, treeDataTransformer } from "@/Utilities/utilities";
+
+import DownloadDropdown from "@/../Components/DownloadDropdown";
+import DetailsDisplay from "../../Components/DetailsDisplay";
+import Heading from "../../Components/Heading";
+import PieChartComponent from "@/../Components/PieChartComponent";
+import TableCell from "@/../Components/Table/TableCell";
+import TableHeading from "@/../Components/Table/TableHeading";
+import Tree from "@/../Components/Tree/Tree";
+import ViewToggle from "@/../Components/ViewToggle";
+import ViewToggle3Options from "@/../Components/ViewToggle3Options";
+
+let treeData = null
+
+// Handler Function to Handle Download Excel Request
 const handleDownloadExcel = async (
   amount,
   funeralExpenses,
@@ -57,6 +62,7 @@ const handleDownloadExcel = async (
   }
 };
 
+// Handler Function to Handle Download PDF Request
 const handleDownloadPDF = async (
   amount,
   funeralExpenses,
@@ -101,8 +107,7 @@ const handleDownloadPDF = async (
   }
 };
 
-
-const sendTestData = async (heirList, total_amount, dispatch) => {
+const handleRequestCalculation = async (heirList, total_amount, dispatch) => {
   if (!heirList || heirList.length === 0) {
     console.warn("No heirs data to send.");
     return;
@@ -122,6 +127,7 @@ const sendTestData = async (heirList, total_amount, dispatch) => {
       }
     );
     console.log("API Response:", response.data);
+    treeData = treeDataTransformer(response.data.heir_list, total_amount)
 
     if (response.data && response.data.heir_list) {
       dispatch(updateHeirSharesList(response.data.heir_list));
@@ -133,8 +139,10 @@ const sendTestData = async (heirList, total_amount, dispatch) => {
 };
 
 const Calculation = () => {
+
   const dispatch = useDispatch();
 
+    const distributionMethod=useSelector((state)=>state.options.distributionMethod)
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
   const mehr = useSelector((state) => state.details.mehr);
@@ -146,10 +154,11 @@ const Calculation = () => {
   const heirSharesList = useSelector((state) => state.heirs.heirSharesList);
   const [viewToggle, setViewToggle] = useState(0);
   const total_amount = amount - funeralExpenses - mehr - debt - will;
+  let is_tree_visible = true
 
   useEffect(() => {
     if (heirList && heirList.length > 0) {
-      sendTestData(heirList, total_amount, dispatch);
+      handleRequestCalculation(heirList, total_amount, dispatch);
     }
   }, []);
 
@@ -157,6 +166,9 @@ const Calculation = () => {
     <>
       {/* Start */}
       <Heading className="w-[35rem]">Islamic Inheritance Calculator</Heading>
+
+
+      {/* Asset Details */}
       <div
         id="asset-screen"
         className="bg-white/60 px-4 rounded-xl mt-4 mx-[25%] "
@@ -167,13 +179,20 @@ const Calculation = () => {
             mehr !== "" ||
             debt !== "" ||
             will !== "") && (
-            <DetailsDisplay>
-              <span>Total Asset Amount</span>
-              <span>
-                {currency} {Number(amount).toLocaleString()}
-              </span>
-            </DetailsDisplay>
-          )}
+              <DetailsDisplay>
+                <span>Total Asset Amount</span>
+                {distributionMethod==='amount'
+                ?
+                <span>
+                  {currency} {Number(amount).toLocaleString()}
+                </span>
+                :
+                <span>
+                {`${Number(amount).toLocaleString()} %`}
+                </span>
+                }
+              </DetailsDisplay>
+            )}
           {funeralExpenses !== "" && (
             <DetailsDisplay className="text-TCR1 text-base">
               <span>Funeral & Burial Expenses</span>
@@ -199,38 +218,56 @@ const Calculation = () => {
             </DetailsDisplay>
           )}
           {will !== "" && (
-            <DetailsDisplay className="text-TCR1 text-base">
-              <span>Will</span>
-              <span>
-                -{currency} {Number(will).toLocaleString()}
-              </span>
-            </DetailsDisplay>
+            distributionMethod === "amount" ?
+              <DetailsDisplay className="text-TCR1 text-base">
+                <span>Will</span>
+                <span>
+                  -{currency} {Number(will).toLocaleString()}
+                </span>
+              </DetailsDisplay> :
+              <DetailsDisplay className="text-TCR1 text-base">
+                <span>Will</span>
+                <span>
+                  {`${Number(will)} %`}
+                </span>
+              </DetailsDisplay>
           )}
           <DetailsDisplay>
             <span>Asset Amount To Be Distributed Among Heirs</span>
+              {distributionMethod==="amount"?
             <span>
-              {currency} {Number(total_amount).toLocaleString()}
-            </span>
+                {currency} {Number(total_amount).toLocaleString()}
+              </span>
+              :
+              <span>
+{`${Number(total_amount).toLocaleString()} %`}
+              </span>
+              }
+              
           </DetailsDisplay>
         </div>
       </div>
+
+      {/* Shares Screen */}
       <div
-        id="input-screen"
+        id="shares-screen"
         className="bg-white/60 p-4 rounded-xl mt-4 mx-[10%]"
       >
+
+        {/* Header Options */}
         <div className="relative">
-          <h1 class="text-3xl font-bold text-TCDG2 text-center mb-4">
+          <h1 className="text-3xl font-bold text-TCDG2 text-center mb-4">
             Heir Shares
           </h1>
           <div className="absolute top-0">
-            <ViewToggle
-              viewToggle={viewToggle}
-              setViewToggle={setViewToggle}
-            ></ViewToggle>
+            {is_tree_visible ? <ViewToggle3Options viewToggle={viewToggle}
+              setViewToggle={setViewToggle}></ViewToggle3Options> : <ViewToggle
+                viewToggle={viewToggle}
+                setViewToggle={setViewToggle}
+              ></ViewToggle>}
           </div>
-          <div
-            className="absolute top-0 right-0"
-            onClick={() => {
+          <div className="absolute top-0 right-0">
+            <DownloadDropdown onExcelClick={() => {
               handleDownloadExcel(
                 amount,
                 funeralExpenses,
@@ -241,15 +278,7 @@ const Calculation = () => {
                 gender,
                 heirSharesList
               );
-            }}
-          >
-            <Button className="!py-1 !text-md !mx-0" onClick>
-              Print Excel
-            </Button>
-          </div>
-          <div
-            className="absolute top-10 right-0"
-            onClick={() => {
+            }} onPdfClick={() => {
               handleDownloadPDF(
                 amount,
                 funeralExpenses,
@@ -260,22 +289,23 @@ const Calculation = () => {
                 gender,
                 heirSharesList
               );
-            }}
-          >
-            <Button className="!py-1 !text-md !mx-0" onClick>
-              Print PDF
-            </Button>
+            }}></DownloadDropdown>
           </div>
         </div>
+
+        {/* Shares Distribution Display */}
+        
         {viewToggle === 0 ? (
-          <div class="overflow-x-auto border-2 border-TCT1 rounded-md">
-            <table class="min-w-full shadow-lg">
+          // Table Display
+          <div className="overflow-x-auto border-2 border-TCT1 rounded-md">
+            <table className="min-w-full shadow-lg">
               <thead>
-                <tr class="bg-TCLG4 text-TCDG2">
+                <tr className="bg-TCLG4 text-TCDG2">
                   <TableHeading>Relation</TableHeading>
                   <TableHeading>Category</TableHeading>
                   <TableHeading>Share</TableHeading>
-                  <TableHeading>Amount</TableHeading>
+                  {distributionMethod==="amount"&&<TableHeading>Amount</TableHeading>
+}
                 </tr>
               </thead>
               <tbody>
@@ -283,20 +313,20 @@ const Calculation = () => {
                   let display_count = heir.val > 1 ? ` × ${heir.val}` : "";
                   let amount_display_count =
                     heir.val > 1
-                      ? ` × ${heir.val} = ${formatNumber(
-                          heir.val * heir.amount
-                        )}`
-                      : "";
-                  let percentage_display_count =
+                    ? ` × ${heir.val} = ${formatNumber(
+                      heir.val * heir.amount
+                    )}`
+                    : "";
+                    let percentage_display_count =
                     heir.val > 1
-                      ? ` × ${heir.val} = ${calculatePercentage(
-                          heir.val * heir.amount,
-                          total_amount
-                        )} %`
+                    ? ` × ${heir.val} = ${calculatePercentage(
+                        heir.val * heir.amount,
+                        total_amount
+                      )} %`
                       : "";
-
-                  return (
-                    <tr key={index} className="bg-TCLG-1">
+                      
+                      return (
+                        <tr key={index} className="bg-TCLG-1">
                       <TableCell>{heir.relation + display_count}</TableCell>
                       <TableCell>{heir.category[1]}</TableCell>
                       <TableCell>
@@ -304,31 +334,44 @@ const Calculation = () => {
                           " %" +
                           percentage_display_count}
                       </TableCell>
-                      <TableCell>
+                          {distributionMethod === "amount"&& <TableCell>
                         {currency +
                           " " +
                           formatNumber(heir.amount) +
                           amount_display_count}
                       </TableCell>
+                }
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-        ) : (
+        )
+         : viewToggle === 1 ? 
+         (
+          // Piechart Display
           <div className="flex justify-center">
             <div className="pl-16 flex w-3/4">
               <PieChartComponent
                 heirSharesList={heirSharesList}
                 total_amount={total_amount}
                 currency={currency}
-              />
+                />
             </div>
           </div>
-        )}
+        ) :
+        // Tree Display
+              // <div className="flex justify-center">
+              //   <div className="pl-16 flex w-3/4 relative">
+              //   <div className="absolute border-2 border-black">
+              <Tree childrenData={treeData['children']} parentsData={treeData['parents']} siblingsData={treeData['siblings']} spouseData={treeData['spouse']}></Tree>
+            //     </div>
+            //   </div>
+            // </div>
+        }
       </div>
-      <div className="w-full h-16"></div>
+      <div className="w-full h-28"></div>
     </>
   );
 };
