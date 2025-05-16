@@ -1,0 +1,59 @@
+.tree-graph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.node {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+  width: 150px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.node-content p {
+  margin: 5px 0;
+}
+
+.node.children {
+  background-color: red;
+}
+
+.node.parents {
+  background-color: blue;
+}
+
+.node.siblings {
+  background-color: yellow;
+}
+
+.node.spouse {
+  background-color: green;
+}
+
+.node.deceased {
+  background-color: gray;
+}
+
+.children {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.spouse,
+.parent {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
