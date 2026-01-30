@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "@/config/api";
+import { useAuth } from "@/context/AuthContext";
 
 import { updateHeirSharesList } from "@/store/heirsSlice";
 import { calculatePercentage, formatNumber, treeDataTransformer } from "@/Utilities/utilities";
@@ -30,7 +33,7 @@ const handleDownloadExcel = async (
 ) => {
   try {
     const response = await axios.post(
-      "http://localhost:8080/inheritance-calculation-xlsx", // Endpoint for Excel
+      API_ENDPOINTS.EXCEL_REPORT,
       {
         total_amount: amount,
         funeral_expenses: funeralExpenses,
@@ -75,7 +78,7 @@ const handleDownloadPDF = async (
 ) => {
   try {
     const response = await axios.post(
-      "http://localhost:8080/inheritance-calculation-pdf",
+      API_ENDPOINTS.PDF_REPORT,
       {
         total_amount: amount,
         funeral_expenses: funeralExpenses,
@@ -115,7 +118,7 @@ const handleRequestCalculation = async (heirList, total_amount, dispatch) => {
 
   try {
     const response = await axios.post(
-      "http://127.0.0.1:8080/inheritance-calculator-2",
+      API_ENDPOINTS.INHERITANCE_CALCULATOR,
       {
         heir_list: heirList,
         total_amount: total_amount,
@@ -141,8 +144,10 @@ const handleRequestCalculation = async (heirList, total_amount, dispatch) => {
 const Calculation = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
-    const distributionMethod=useSelector((state)=>state.options.distributionMethod)
+  const distributionMethod=useSelector((state)=>state.options.distributionMethod)
   const amount = useSelector((state) => state.details.amount);
   const funeralExpenses = useSelector((state) => state.details.funeralExpenses);
   const mehr = useSelector((state) => state.details.mehr);
@@ -161,6 +166,41 @@ const Calculation = () => {
       handleRequestCalculation(heirList, total_amount, dispatch);
     }
   }, []);
+
+  // Handle Consult Ulema - store inheritance data and navigate
+  const handleConsultUlema = () => {
+    // Store the inheritance calculation results for sharing with Ulema
+    const inheritanceData = {
+      total_amount: amount,
+      distributable_amount: total_amount,
+      funeral_expenses: funeralExpenses,
+      mehr: mehr,
+      debt: debt,
+      will: will,
+      currency: currency,
+      gender: gender,
+      heir_shares: heirSharesList.map(heir => ({
+        relation: heir.relation,
+        category: heir.category,
+        count: heir.val,
+        amount: heir.amount,
+        percentage: ((heir.amount / total_amount) * 100).toFixed(2)
+      }))
+    };
+    
+    // Store in localStorage for sharing with Ulema
+    localStorage.setItem("inheritance_result", JSON.stringify(inheritanceData));
+    localStorage.setItem("share_inheritance", "true"); // Flag to indicate we should share
+    
+    // Navigate to ulema selection or login
+    if (isAuthenticated()) {
+      navigate("/consult-ulema");
+    } else {
+      // Store return URL and redirect to login
+      localStorage.setItem("redirect_after_login", "/consult-ulema");
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -371,6 +411,38 @@ const Calculation = () => {
             // </div>
         }
       </div>
+
+      {/* Consult Ulema Section */}
+      {heirSharesList && heirSharesList.length > 0 && (
+        <div className="bg-white/60 p-6 rounded-xl mt-4 mx-[10%] text-center">
+          <h3 className="text-xl font-semibold text-TCDG2 mb-3">
+            Need Expert Verification?
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Consult with our certified Ulema to verify your inheritance calculation
+          </p>
+          <button
+            onClick={handleConsultUlema}
+            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-lg transition-all duration-200 flex items-center gap-2 mx-auto"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            Consult Ulema
+          </button>
+        </div>
+      )}
+
       <div className="w-full h-28"></div>
     </>
   );

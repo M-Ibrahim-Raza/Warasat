@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { API_ENDPOINTS } from "@/config/api";
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]); 
@@ -14,7 +15,7 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, userMessage]); 
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/get_answer", {
+      const response = await fetch(API_ENDPOINTS.CHATBOT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: input }),
